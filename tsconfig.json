@@ -1,0 +1,6 @@
+{
+  "extends": "@market-making-book/config/tsconfig.base.json",
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
+}

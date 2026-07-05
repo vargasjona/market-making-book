@@ -1,0 +1,26 @@
+---
+title: "10. Polymarket: On-Chain Prediction Markets"
+description: "A hybrid CLOB settling in USDC on Polygon — where the house pays you a daily salary just for resting good quotes."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part III · Chapter 10</div>
+
+<div className="vmeta"> <div className="vm"><span className="k">Instrument</span><div className="v">Outcome tokens (ERC-1155, CTF)</div></div> <div className="vm"><span className="k">Collateral</span><div className="v">pUSD on Polygon (1:1 USDC)</div></div> <div className="vm"><span className="k">Book</span><div className="v">Off-chain CLOB, on-chain settle</div></div> <div className="vm"><span className="k">Maker fee</span><div className="v">Never charged</div></div> <div className="vm"><span className="k">Taker fee</span><div className="v">rate·p·(1−p), by category</div></div> <div className="vm"><span className="k">Resolution</span><div className="v">UMA Optimistic Oracle</div></div> </div>
+
+### The plumbing
+
+<p>Every YES/NO pair is fully collateralized: exactly $1.00 of collateral sits locked in Gnosis's Conditional Tokens Framework per share pair, so YES + NO = $1 is enforced by a smart contract, not by trust. (Since the April 28, 2026 exchange upgrade — CTF Exchange V2 — that collateral is <strong>pUSD</strong>, Polymarket's own dollar token, itself backed 1:1 by USDC with the backing enforced on-chain.) Taker fees follow the same parabola shape as Kalshi's, with the rate set per category — roughly: crypto 0.07, sports 0.03, politics/finance 0.04, most others 0.05, geopolitics fee-free — and makers are never charged. Resolution flows through <strong>UMA's optimistic oracle</strong>: a bonded proposer asserts the outcome, a ~2-hour liveness window allows bonded disputes, and contested cases escalate to a multi-day UMA token-holder vote. Since November 2025, proposing is no longer permissionless — a whitelist of vetted proposers (Managed Optimistic Oracle V2) asserts outcomes, though anyone can still dispute. This is the venue's distinctive tail risk: <strong>resolution risk</strong> — ambiguous wording or a contentious dispute can settle a market against the "obvious" answer (over a thousand markets were disputed in the first half of 2026 alone). Price it into every position you carry to resolution.</p>
+
+<p><strong>And the US question:</strong> since December 2, 2025 there are effectively two Polymarkets — the global crypto-native venue this chapter describes, and <strong>Polymarket US</strong>, a CFTC-regulated exchange (built on the QCEX license acquired for $112M) with intermediated access for US users. The Kalshi chapter's "US legal" edge is no longer unique; check which venue, and which rulebook, you're actually quoting on.</p>
+
+### The liquidity rewards program: getting paid to exist
+
+<p>Polymarket's signature mechanism: a daily per-market budget, divided among makers by a per-minute sampling score. The score rewards orders by a <strong>quadratic function of closeness to the midpoint</strong> — an order 1¢ from mid scores dramatically more than one 3¢ away — and rewards <strong>two-sidedness</strong>: with the midpoint inside the 10–90¢ band, quoting only one side is worth exactly a third (the score divides the single side by 3); outside that band, single-sided quoting scores <em>zero</em> and only genuinely two-sided depth still earns. Crucially, <strong>you earn whether or not you're filled</strong>. April 2026 alone distributed over $5M in incentives, plus a maker-rebate program recycling 20–25% of taker fees back to makers (25% standard, 20% on crypto markets), paid daily.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — reward score vs. distance from mid</span></div> <div className="fig-body"> <canvas id="cv-poly" height="200"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Your distance from mid: <b id="po-d-v">1.0¢</b></label><input type="range" id="po-d" min="1" max="30" defaultValue="10" /></div> <div className="ctrl"><label>Max scoring spread: <b id="po-m-v">3.0¢</b></label><input type="range" id="po-m" min="10" max="60" defaultValue="30" /></div> </div> <div className="readout"> <div className="r"><span className="k">Relative score</span><span className="v pos" id="po-s">—</span></div> <div className="r"><span className="k">Reading</span><span className="v" id="po-read" style={{fontSize:'13px',maxWidth:'340px'}}>—</span></div> </div> </div> <div className="fig-cap">The score S ∝ ((max−d)/max)² collapses quadratically with distance d from the mid and hits zero outside the max scoring spread. The economic tension of the whole venue in one curve: the closer you quote, the more salary you collect — and the more adverse selection you absorb. Proposal C (Chapter 18) optimizes exactly this trade-off.</div> </div>
+
+<div className="keyidea"><span className="tag">Polymarket MM doctrine</span>Treat rewards as a yield on parked two-sided depth. Farm calm, long-dated markets (low jump risk, full salary); in news-driven markets, quote at the distance where reward ≥ expected adverse selection, not a tick closer. Respect resolution risk as a position limit, not a footnote.</div>
+
+<FigRuntime chapter="ch10" />
+</div>

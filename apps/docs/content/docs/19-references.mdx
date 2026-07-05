@@ -1,0 +1,118 @@
+---
+title: "19. References"
+description: "The primary sources behind every claim in this book. Venue parameters change — the official docs always win."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part V · Chapter 19</div>
+
+### Foundational theory
+
+<div className="ref"><b>Ho, T. &amp; Stoll, H.</b> (1981). "Optimal dealer pricing under transactions and return uncertainty." <i>Journal of Financial Economics</i> 9(1), 47–73.</div>
+
+<div className="ref"><b>Glosten, L. &amp; Milgrom, P.</b> (1985). "Bid, ask and transaction prices in a specialist market with heterogeneously informed traders." <i>Journal of Financial Economics</i> 14(1), 71–100.</div>
+
+<div className="ref"><b>Kyle, A.</b> (1985). "Continuous auctions and insider trading." <i>Econometrica</i> 53(6), 1315–1336.</div>
+
+<div className="ref"><b>Avellaneda, M. &amp; Stoikov, S.</b> (2008). "High-frequency trading in a limit order book." <i>Quantitative Finance</i> 8(3), 217–224.</div>
+
+<div className="ref"><b>Guéant, O., Lehalle, C-A. &amp; Fernandez-Tapia, J.</b> (2013). "Dealing with the inventory risk: a solution to the market making problem." <i>Mathematics and Financial Economics</i> 7(4), 477–507. (arXiv:1105.3115)</div>
+
+<div className="ref"><b>Guéant, O.</b> (2017). "Optimal market making." <i>Applied Mathematical Finance</i> 24(2). (The modern general formulation of the GLFT family.)</div>
+
+<div className="ref"><b>Bergault, P., Evangelista, D., Guéant, O. &amp; Vieira, D.</b> (2021). "Closed-form approximations in multi-asset market making." <i>Applied Mathematical Finance</i> 28(2). (arXiv:1810.04383 — the multi-asset extension used when quoting correlated markets.)</div>
+
+<div className="ref"><b>Barzykin, A., Bergault, P. &amp; Guéant, O.</b> (2023). "Algorithmic market making in dealer markets with hedging and market impact." <i>Mathematical Finance</i> 33(1), 41–79. (The rigorous theory behind quote-here-hedge-there.)</div>
+
+<div className="ref"><b>Cartea, Á., Jaimungal, S. &amp; Penalva, J.</b> (2015). <i>Algorithmic and High-Frequency Trading.</i> Cambridge University Press. (The standard textbook for the stochastic-control view.)</div>
+
+<div className="ref"><b>Stoikov, S.</b> (2018). "The micro-price: a high-frequency estimator of future prices." <i>Quantitative Finance</i> 18(12), 1959–1966.</div>
+
+<div className="ref"><b>Kolm, P., Turiel, J. &amp; Westray, N.</b> (2023). "Deep order flow imbalance: extracting alpha at multiple horizons from the limit order book." <i>Mathematical Finance</i> 33(4), 1044–1081. (The deep-learning successor to microprice-style signals.)</div>
+
+<div className="ref"><b>Easley, D., López de Prado, M. &amp; O'Hara, M.</b> (2012). "Flow toxicity and liquidity in a high-frequency world." <i>Review of Financial Studies</i> 25(5). (VPIN; for the critique see Andersen, T. &amp; Bondarenko, O. (2014), "VPIN and the flash crash," <i>Journal of Financial Markets</i> 17.)</div>
+
+### Charts &amp; technical analysis (Chapter 2)
+
+<div className="ref"><b>Nison, S.</b> (1991). <i>Japanese Candlestick Charting Techniques.</i> New York Institute of Finance. (The book that brought Homma's candlesticks west.)</div>
+
+<div className="ref"><b>Lo, A., Mamaysky, H. &amp; Wang, J.</b> (2000). "Foundations of technical analysis: computational algorithms, statistical inference, and empirical implementation." <i>Journal of Finance</i> 55(4), 1705–1765. (The honest academic appraisal of chart patterns.)</div>
+
+<div className="ref"><b>J.P. Morgan / Reuters</b> (1996). <i>RiskMetrics — Technical Document</i>, 4th ed. (The EWMA volatility estimator every quoting engine still runs.)</div>
+
+### Learning-based market making
+
+<div className="ref"><b>Gašperov, B., Begušić, S., Posedel Šimović, P. &amp; Kostanjčar, Z.</b> (2021). "Reinforcement learning approaches to optimal market making." <i>Mathematics</i> 9(21), 2689.</div>
+
+<div className="ref"><b>Gašperov, B. &amp; Kostanjčar, Z.</b> (2021). "Market making with signals through deep reinforcement learning." <i>IEEE Access</i> 9, 61611–61622.</div>
+
+<div className="ref"><b>Spooner, T., Fearnley, J., Savani, R. &amp; Koukorinis, A.</b> (2018). "Market making via reinforcement learning." <i>AAMAS 2018</i>.</div>
+
+<div className="ref"><b>Ganesh, S. et al.</b> (2019). "Reinforcement learning for market making in a multi-agent dealer market." arXiv:1911.05892.</div>
+
+<div className="ref"><b>Falces Marin, J., Díaz Pardo de Vera, D. &amp; López Gonzalo, E.</b> (2022). "A reinforcement learning approach to improve the performance of the Avellaneda-Stoikov market-making algorithm." <i>PLOS ONE</i> 17(12). ("Alpha-AS")</div>
+
+<div className="ref"><b>Spooner, T. &amp; Savani, R.</b> (2020). "Robust market making via adversarial reinforcement learning." <i>IJCAI 2020</i>. (arXiv:2003.01820 — train against an adversary, inherit risk aversion.)</div>
+
+<div className="ref"><b>Cao, J., Šiška, D., Szpruch, L. &amp; Treetanthiploet, T.</b> (2024). "Logarithmic regret in the ergodic Avellaneda–Stoikov market making model." arXiv:2409.02025. (Provable online learning of AS's fill parameters.)</div>
+
+<div className="ref"><b>Hoque, M.R., Ferdaus, M.M. &amp; Hassan, M.K.</b> (2025). "Reinforcement learning in financial decision making: a systematic review." arXiv:2512.10913. (167 papers, 2017–2025 — the current RL-in-finance survey.)</div>
+
+<div className="ref"><b>LOB world models for training:</b> Coletta, A. et al. (2022), "Learning to simulate realistic limit order book markets from data as a World Agent," <i>ICAIF 2022</i>; Nagy, P. et al. (2023), "Generative AI for end-to-end limit order book modelling," <i>ICAIF 2023</i> (arXiv:2309.00638); Berti, L. et al. (2025), "TRADES: generating realistic market simulations with diffusion models," arXiv:2502.07071; JaxMARL-HFT (2025), arXiv:2511.02136 (GPU-scale multi-agent LOB RL).</div>
+
+### Crypto market making in practice (Chapter 17)
+
+<div className="ref"><b>Stoikov, S., Zhuang, E., Chen, H., Zhang, Q., Wang, S., Li, S. &amp; Shan, C.</b> (2024). "Market Making in Crypto." SSRN Working Paper 5066176, Cornell Financial Engineering Manhattan. (The Bar Portion signal, the 4–5× monthly-vol spread rule, triple-barrier risk overlay, and the live Hummingbot A/B on SOL/DOGE/GALA perpetuals.)</div>
+
+<div className="ref"><b>López de Prado, M.</b> (2018). <i>Advances in Financial Machine Learning.</i> Wiley. (Origin of the triple-barrier method, Chapter 16.)</div>
+
+<div className="ref"><b>Grid trading, honestly:</b> "Dynamic grid trading strategy: from zero expectation to market outperformance" (2025), arXiv:2506.11921. (Proves the plain grid's expected return is zero absent drift or vol edge.)</div>
+
+<div className="ref"><b>Perpetual futures &amp; funding:</b> He, S., Manela, A., Ross, O. &amp; von Wachter, V., "Fundamentals of perpetual futures," arXiv:2212.06888; Ackerer, D. et al. (2026), "Perpetual futures pricing," <i>Mathematical Finance</i>.</div>
+
+<div className="ref"><b>Tooling:</b> hftbacktest (github.com/nkaz001/hftbacktest — tick-level, queue-aware backtests with a worked GLFT tutorial) · Optuna (optuna.org — parameter search).</div>
+
+### Prediction markets &amp; sports microstructure
+
+<div className="ref"><b>Dalen, S.</b> (2025). "Toward Black-Scholes for prediction markets: a unified kernel and market-maker's handbook." arXiv:2510.15205.</div>
+
+<div className="ref"><b>Dubach, P.D.</b> (2026). "The anatomy of a decentralized prediction market: microstructure evidence from the Polymarket order book." arXiv:2604.24366. (30B book events; what the public feed does and doesn't tell you.)</div>
+
+<div className="ref"><b>Croxson, K. &amp; Reade, J.J.</b> (2014). "Information and efficiency: goal arrival in soccer betting." <i>The Economic Journal</i> 124(575), 62–91. (In-play prices absorb scoring events near-instantly.)</div>
+
+<div className="ref"><b>O'Malley, A. J.</b> (2008). "Probability formulas and statistical analysis in tennis." <i>Journal of Quantitative Analysis in Sports</i> 4(2); and <b>Barnett, T. &amp; Clarke, S.</b> (2005). "Combining player statistics to predict outcomes of tennis matches." <i>IMA Journal of Management Mathematics</i> 16(2).</div>
+
+<div className="ref"><b>Courtsiding evidence:</b> study of 141 Grand Slam matches (Roland Garros/Wimbledon 2009–2014, Betfair in-play data) documenting ~3.56% cumulative abnormal returns within the 5-second post-set window; see also Betfair's published in-play delay policies (betangel.com/betfair-inplay-delay).</div>
+
+### Market events &amp; structure
+
+<div className="ref"><b>SEC &amp; CFTC</b> (2010). "Findings regarding the market events of May 6, 2010." sec.gov/files/marketevents-report.pdf.</div>
+
+<div className="ref"><b>Christie, W. &amp; Schultz, P.</b> (1994). "Why do NASDAQ market makers avoid odd-eighth quotes?" <i>Journal of Finance</i> 49(5).</div>
+
+<div className="ref"><b>Congressional Research Service</b> (2024). "Payment for order flow." Report IF12594.</div>
+
+<div className="ref"><b>SEC</b>. Regulation NMS: Rules 610, 611, 612 (2005, as amended; 2024 tick/fee-cap amendments delayed to Nov 2027; Rule 611 rescission proposed June 2026); 2024 dealer-definition amendments (Rules 3a5-4, 3a44-2 — vacated by N.D. Texas Nov 2024, appeal withdrawn Feb 2025).</div>
+
+### Venue documentation (authoritative for all parameters)
+
+<div className="ref"><b>Kalshi:</b> docs.kalshi.com (API: Create/Amend/Batch Orders, Queue Positions, WebSocket) · kalshi.com/fee-schedule.</div>
+
+<div className="ref"><b>Polymarket:</b> docs.polymarket.com (CLOB, CTF, fees, liquidity rewards) · help.polymarket.com (maker rebates) · docs.uma.xyz (optimistic oracle).</div>
+
+<div className="ref"><b>Hyperliquid:</b> hyperliquid.gitbook.io/hyperliquid-docs (fees, funding, HLP, protocol vaults).</div>
+
+<div className="ref"><b>Binance:</b> binance.com/en/fee (spot/futures VIP schedules) · Binance Market Maker Program pages.</div>
+
+<div className="ref"><b>Interactive Brokers:</b> ibkr.com fee &amp; rebate pass-through documentation · <b>Alpaca:</b> docs.alpaca.markets.</div>
+
+<div className="ref"><b>Tooling:</b> nautilustrader.io (event-driven backtest/live engine; L2-delta replay, queue-aware fills, Polymarket/BinaryOption adapter) · hummingbot.org (V2 controllers pmm_simple / pmm_dynamic / xemm_multiple_levels; legacy avellaneda_market_making, cross_exchange_market_making; paper mode).</div>
+
+### Industry &amp; press (context figures)
+
+<div className="ref"><b>Sacra</b> (2026). Kalshi revenue/volume estimates ($22.9B volume 2025; sports ≈89% of fee revenue). <b>TechCrunch</b> (May 2026). Kalshi $1B Series F at $22B valuation.</div>
+
+<div className="ref"><b>JELLY incident</b> (March 2025): Hyperliquid post-mortems and contemporaneous reporting (loss figures vary $10.5–15.3M across sources; treat as indicative).</div>
+
+<p className="small" style={{marginTop:'30px'}}>Figures marked indicative (HLP yields, rebate magnitudes, UMA bond sizes, incident losses) come from secondary sources and change over time. This book is educational material, not financial, legal, or investment advice.</p>
+</div>

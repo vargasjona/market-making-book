@@ -1,0 +1,16 @@
+---
+title: "14. Which Algorithm for Which Market"
+description: "Sports, stocks, and crypto are three different physics. Matching the algorithm to the price process is half the job."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part IV · Chapter 14</div>
+
+<table><tbody> <tr><th>Dimension</th><th>Sports / prediction</th><th>Stocks</th><th>Crypto</th></tr> <tr><td><strong>Price process</strong></td><td>Jump-diffusion on [0,1], vol crush at resolution</td><td>Diffusion + scheduled jumps (earnings, macro)</td><td>Diffusion + unscheduled jumps, 24/7</td></tr> <tr><td><strong>Fair-value anchor</strong></td><td>External model (Markov match model)</td><td>Microprice + order-flow signals</td><td>Cross-venue price + microprice</td></tr> <tr><td><strong>Dominant risk</strong></td><td>Courtsider adverse selection at events</td><td>Institutional informed flow; queue games</td><td>Cross-exchange arb pick-offs; trend inventory</td></tr> <tr><td><strong>Hedging</strong></td><td>Essentially none (binary, no underlying)</td><td>Rich (correlated names, ETFs, options)</td><td>Excellent (perps, other venues)</td></tr> <tr><td><strong>Fee regime</strong></td><td>Parabolic taker fees ⇒ maker-only</td><td>Rebate capture; reg constraints</td><td>Tiered; rebates at volume</td></tr> <tr><td><strong>Best-fit algorithms</strong></td><td>Model-anchored AS-in-logit + event gating (Prop. A/B)</td><td>GLFT + microprice + queue craft</td><td>Cross-exchange hedged MM, grids in ranges, funding-aware perps MM</td></tr> </tbody></table>
+
+### Reading the table strategically
+
+<ul> <li><strong>Sports:</strong> your edge is the <em>model and the event reflex</em>, not latency-in-general. A correct fair value 300ms after a point beats a fast-but-naive quote every time. Unhedgeable inventory means caps must be honest.</li> <li><strong>Stocks:</strong> the rebate and the queue are the business; the math (GLFT) governs the residual inventory. For most independents, options spreads are the more realistic prize (Ch. 13).</li> <li><strong>Crypto:</strong> the hedge leg transforms the problem: with instant hedging, inventory risk shrinks and the game becomes fees + slippage + toxicity. Funding adds a carry dimension unique to perps. (Chapter 17 walks the complete build, from signal to live bot.)</li> </ul>
+
+<div className="keyidea"><span className="tag">One principle above all</span>The algorithm follows the price process; the price process follows the asset. Never port a quoting engine across asset classes without re-deriving what σ, jumps, (T−t), and "fair value" even mean there.</div>
+</div>

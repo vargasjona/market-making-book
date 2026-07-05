@@ -1,0 +1,28 @@
+---
+title: "Foreword"
+description: "Everything you need to understand, evaluate, and design market making strategies — from your first order book to venue-specialized algorithms for Kalshi, Polymarket, Hyperliquid, Binance, and beyond."
+---
+
+<div className="mm-book">
+<div className="eyebrow">A practitioner's manual</div>
+
+<h2 className="ch-title">The Market Making Book</h2>
+
+<p className="ch-lede">Everything you need to understand, evaluate, and design market making strategies — from your first order book to venue-specialized algorithms for Kalshi, Polymarket, Hyperliquid, Binance, and beyond.</p>
+
+<div className="fig cover-tape"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">live — a market maker at work</span></div> <div className="fig-body"><canvas id="cv-cover" height="190"></canvas></div> <div className="fig-cap">A market maker continuously quoting a bid (green) and an ask (red) around a moving price. Every dot is a trader hitting one of the quotes. This entire book explains what you're looking at.</div> </div>
+
+<div className="badgerow"> <span className="badge">19 chapters + glossary</span><span className="badge">30 interactive figures</span><span className="badge">Deep math + parables</span><span className="badge">6 venue analyses</span><span className="badge">6 original algorithm proposals</span> </div>
+
+### How to read this book
+
+<p>This book is organized like a course, in the spirit of <em>The Rust Programming Language</em>: each chapter builds on the previous one, and the navigation lives in the sidebar. <strong>Part I</strong> teaches trading from absolute zero — the order book, then the chart toolkit every platform shares (candlesticks, timeframes, EMAs, order types), then the market maker's role and history. <strong>Part II</strong> develops the theory — the real mathematics, but every formula arrives with a parable that makes it obvious. <strong>Part III</strong> dissects six real venues. <strong>Part IV</strong> matches algorithms to asset classes, covers risk, and closes with a hands-on crypto practicum — a complete, reproducible path from signal research to a live bot. <strong>Part V</strong> proposes six new, testable, state-of-the-art strategies — the destination of the whole book.</p>
+
+<p>Every dark panel is a <strong>live figure</strong>: drag the sliders, press the buttons, break things. The figures are simplified simulations designed to build intuition, not production simulators.</p>
+
+<div className="keyidea"><span className="tag">The one-sentence summary</span>Market making is the business of selling immediacy: you quote two prices at once, earn the gap between them, and spend your entire professional life managing the two risks that gap must pay for — <strong>inventory risk</strong> and <strong>adverse selection</strong>.</div>
+
+<p className="small">Educational material, not financial advice. Fee schedules and venue rules change frequently — always verify against official documentation (Chapter 19 collects the references).</p>
+
+<FigRuntime chapter="ch0" />
+</div>

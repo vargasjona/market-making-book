@@ -1,0 +1,18 @@
+---
+title: "13. Interactive Brokers & Alpaca: The Equities Reality Check"
+description: "In US equities, \"market maker\" is a legal status you probably can't have — but liquidity-providing strategies are still on the table."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part III · Chapter 13</div>
+
+### Why you can't just market-make Apple
+
+<p>Registered market makers on lit US equity exchanges must be registered broker-dealers, exchange members (in practice FINRA members too), with minimum net capital and continuous two-sided quoting obligations during market hours. The SEC tried to pull even de-facto liquidity providers into dealer registration with its 2024 dealer-definition amendments — but a federal court vacated those rules in November 2024 and the SEC abandoned its appeal in early 2025, so the older, narrower dealer framework governs. Retail accounts at IBKR or Alpaca still meet none of the registered-MM criteria — and Reg NMS (Rule 611's trade-through protection, Rule 610's access-fee cap, Rule 612's penny tick) shapes the playing field around protected quotes you can't directly join as a dealer. That terrain is shifting too: a half-penny tick for tick-constrained stocks and a much lower access-fee cap are adopted but delayed to late 2027, and in mid-2026 the SEC proposed rescinding Rule 611 outright. Rules quoted here are the operative mid-2026 ones; re-check before building anything on them.</p>
+
+### What you can do
+
+<ul> <li><strong>Liquidity-providing limit strategies.</strong> Post non-marketable limit orders; on IBKR's tiered pricing, exchange maker rebates are passed through to you. With Post-Only routing to rebate venues, a patient strategy can run a maker-style book — at far lower frequency than true MM. (The old Pattern Day Trader rule — $25k minimum for frequent day-trading — was retired in June 2026; brokers now apply risk-based <em>intraday margin</em> instead, so the constraint is your margin capacity, not a day-trade counter.)</li> <li><strong>Options as the real spread game.</strong> Options markets are where wide spreads still exist for sophisticated retail. The professional MM toolkit there is the Greeks: quote options, <strong>delta-hedge</strong> with the underlying, manage <strong>gamma</strong> (short-gamma positions lose in big moves and must buy high/sell low to rehedge) and <strong>vega</strong> (IV exposure, hedged with offsetting options). Several options exchanges still allocate fills <strong>pro-rata</strong> with customer priority — size, not speed, earns allocation there.</li> <li><strong>Alpaca as an execution lab.</strong> Commission-free API equities (now trading 24/5) and 24/7 crypto spot make Alpaca a natural sandbox for signal-driven liquidity provision — closer to "patient limit-order alpha" than market making proper.</li> </ul>
+
+<div className="keyidea"><span className="tag">Equities doctrine</span>Treat US equities as a rebate-capture and options-spread environment, not an MM venue. Your true MM capital belongs where Part III started: young venues with maker-hungry rulebooks.</div>
+</div>

@@ -1,0 +1,22 @@
+---
+title: "11. Hyperliquid: Perps on a Purpose-Built Chain"
+description: "A fully on-chain order book fast enough to market-make — plus a protocol-owned vault that democratized (and stress-tested) the business."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part III · Chapter 11</div>
+
+<div className="vmeta"> <div className="vm"><span className="k">Instrument</span><div className="v">Perpetual futures (+ spot)</div></div> <div className="vm"><span className="k">Chain</span><div className="v">Own L1, sub-second finality</div></div> <div className="vm"><span className="k">Base fees</span><div className="v">0.015% maker / 0.045% taker</div></div> <div className="vm"><span className="k">Maker rebates</span><div className="v">Up to ~−0.003% (volume tiers)</div></div> <div className="vm"><span className="k">Funding</span><div className="v">Hourly, vs. oracle price</div></div> <div className="vm"><span className="k">HLP vault</span><div className="v">Protocol-owned MM, open deposits</div></div> </div>
+
+### What makes it different
+
+<ul> <li><strong>An honest on-chain CLOB.</strong> Unlike AMM-based DEXes, Hyperliquid runs a real order book on its own chain — limit orders, queues, maker rebates — at ~70% of decentralized-perps volume in early 2025.</li> <li><strong>Funding settles on the oracle price</strong> (a validator-weighted median of CEX spot prices), paid hourly: F = premium + clamp(interest − premium), capped at 4%/hour. For an MM, funding is a <em>carry stream you can harvest</em>: persistent positive funding pays shorts — so your inventory target shouldn't be zero, it should lean toward the paid side. That idea becomes Proposal D.</li> <li><strong>HLP — the protocol's own market maker.</strong> A community-funded vault that runs MM strategies and performs liquidations, sharing 100% of P&amp;L with depositors (4-day lockup). It's the most interesting institutional experiment in the book: market making as a public utility.</li> </ul>
+
+### The JELLY incident: a free masterclass in tail risk
+
+<p>March 26, 2025. An attacker opened a ~$4–5M short on JELLY, an illiquid memecoin, then deliberately self-liquidated — dumping the toxic short <em>into HLP</em>, which inherits liquidated positions. The attacker then pumped JELLY's price on-chain (helped by rival exchanges listing JELLY perps mid-attack), driving HLP's unrealized loss toward ~$13.5M and threatening the entire vault. Validators voted within minutes to delist JELLY and force-settle at $0.0095 — saving the vault by doing something very centralized on a "decentralized" venue. Lessons that generalize to every venue in this book:</p>
+
+<ul> <li><strong>Never quote (or inherit) size in instruments whose float you don't understand.</strong> Illiquidity is not a smaller version of liquidity; it's a different risk regime.</li> <li><strong>Know your venue's emergency powers</strong> — they may save you or settle against you.</li> <li><strong>Liquidation flow is the most toxic flow that exists.</strong> If your strategy absorbs it (as HLP does), cap it ruthlessly.</li> </ul>
+
+<div className="keyidea"><span className="tag">Hyperliquid MM doctrine</span>Quote only deep majors (BTC/ETH/SOL), anchor on the oracle (funding settles there), bias inventory toward the funding-paid side, chase maker-rebate tiers, and treat JELLY as required reading before sizing anything.</div>
+</div>

@@ -1,0 +1,54 @@
+---
+title: "5. The Two Fears: Inventory Risk & Adverse Selection"
+description: "Why does a spread exist at all? Two Nobel-grade answers: because holding things is risky (Ho–Stoll), and because some of your customers know more than you (Glosten–Milgrom, Kyle)."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part II · Chapter 5</div>
+
+### Fear #1 — Inventory risk (Ho &amp; Stoll, 1981)
+
+<p>Ho and Stoll gave the first rigorous treatment of Rosa's first fear: a risk-averse dealer facing random buy and sell arrivals should not quote symmetrically around fair value once they hold a position. Holding inventory exposes the dealer to price moves they have no opinion about; a rational dealer charges for that exposure by <strong>skewing</strong> quotes — long inventory pushes both bid and ask <em>down</em> (eager to sell, reluctant to buy more), short inventory pushes both <em>up</em>. The skew grows with risk aversion, variance, and the time you expect to hold the position. Avellaneda–Stoikov (Chapter 6) turned this insight into the closed-form equations everyone uses today.</p>
+
+### Fear #2 — Adverse selection (Glosten &amp; Milgrom, 1985)
+
+<p>Glosten and Milgrom proved something stranger: <strong>even a risk-neutral market maker with zero costs and zero profit must quote a positive spread</strong>, purely because of information asymmetry. In their model, each arriving trader is <em>informed</em> with probability μ (they know the asset's true value) or a <em>noise trader</em> with probability 1−μ (they trade for liquidity reasons). The MM can't tell them apart. But the MM knows that a buy order is more likely to come from someone who knows the value is high — so the very act of receiving a buy order should raise the MM's estimate of value. The zero-profit quotes are conditional expectations:</p>
+
+<div className="eq"><span className="lbl">Glosten–Milgrom quotes</span> ask = E[ <i>V</i> | next trader buys ]&nbsp;&nbsp;&nbsp;&nbsp;bid = E[ <i>V</i> | next trader sells ] <span className="where"><span className="wt">What the symbols mean</span> <span className="sym"><i>V</i></span> — the asset's true (unknown) value &nbsp;·&nbsp; <span className="sym">E[ <i>V</i> | … ]</span> — read the bar "|" as <em>"given that"</em>: the average value of V <em>given that</em> the event after the bar happens. So the ask is: "what is the asset worth, on average, in the worlds where someone chooses to buy from me?" Since buyers are disproportionately people who know V is high, that conditional average sits <em>above</em> the plain average — and that's the ask.</span></div>
+
+<p>The ask sits above the unconditional expectation and the bid below it; the gap is the pure <strong>adverse-selection spread</strong>. Each trade then updates the MM's beliefs (Bayes' rule), which is precisely how prices come to reflect information over time.</p>
+
+<div className="parable"><span className="tag">Parable · The used-car dealer</span> A used-car dealer offers to buy any car, sight unseen. Who shows up first? Disproportionately, people whose cars have hidden problems. The dealer isn't quoting against the <em>average</em> car — they're quoting against the cars that <em>choose to come</em>. So the buy price must be lowered below the average value until the deal breaks even against the self-selected flow. That discount is adverse selection, and it exists even if the dealer fears no risk at all.</div>
+
+### Glosten–Milgrom by the numbers
+
+<p>The model becomes unforgettable with one concrete case. Take a binary contract (a Kalshi-style YES) whose true value is $1 or $0 with equal prior probability. A fraction <strong>μ</strong> of arriving traders are informed (they know the answer); the rest flip a coin. Bayes' rule gives the zero-profit quotes in closed form — and at a 50/50 prior they collapse to something beautiful:</p>
+
+<div className="eq"><span className="lbl">GM quotes at a 50¢ prior</span> ask = (1 + μ)/2 &nbsp;&nbsp;&nbsp;&nbsp; bid = (1 − μ)/2 &nbsp;&nbsp;&nbsp;&nbsp; spread = μ <span className="where"><span className="wt">What the symbols mean</span> <span className="sym">μ</span> (mu) — the fraction of arriving traders who are <em>informed</em> (they already know the outcome), from 0 to 1. Prices are in dollars on a contract that settles at $1 or $0. Example: μ = 0.2 → ask = (1+0.2)/2 = 60¢, bid = (1−0.2)/2 = 40¢, spread = 20¢.</span></div>
+
+<p><strong>The spread equals the informed fraction.</strong> If 20% of your counterparties know the outcome, the break-even market is 40¢ bid / 60¢ ask — a 20¢ spread on a 50¢ contract, with zero risk aversion and zero fees. And the model doesn't stop at one trade: after each fill the market maker updates the prior (a buy moves it up to the old ask, a sell down to the old bid) and posts fresh quotes around the new belief. Run it yourself:</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — bayesian quoting &amp; price discovery</span></div> <div className="fig-body"> <canvas id="cv-gm" height="220"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Informed fraction μ: <b id="gm-mu-v">30%</b></label><input type="range" id="gm-mu" min="0" max="90" defaultValue="30" /></div> <button className="btn buy" id="gm-buy">A BUY arrives</button> <button className="btn sell" id="gm-sell">A SELL arrives</button> <button className="btn" id="gm-auto">Auto-flow ▸</button> <button className="btn" id="gm-reset">Reset to 50¢</button> </div> <div className="readout"> <div className="r"><span className="k">Belief P(V=1)</span><span className="v" id="gm-px">50.0¢</span></div> <div className="r"><span className="k">Bid</span><span className="v pos" id="gm-bid">—</span></div> <div className="r"><span className="k">Ask</span><span className="v neg" id="gm-ask">—</span></div> <div className="r"><span className="k">Spread</span><span className="v" id="gm-spr">—</span></div> </div> </div> <div className="fig-cap">The amber line is the market maker's belief; the shaded band is the bid–ask pair Bayes' rule demands. Every BUY pushes belief up to the old ask, every SELL down to the old bid — this staircase <em>is</em> price discovery: the market learning from its own order flow. Slide μ up and watch the band widen and each step grow — informed markets move fast and charge a toll; slide μ to 0 and the band closes to nothing, because uninformed flow teaches the market nothing. Auto-flow simulates a true value the crowd slowly reveals.</div> </div>
+
+### Kyle (1985): how much does flow move price?
+
+<p>Kyle modeled a single informed trader hiding inside noise-trader flow, with a market maker setting price as a linear function of the net order flow:</p>
+
+<div className="eq"><span className="lbl">Kyle's lambda</span>Δ<i>P</i> = λ · (net order flow) <span className="where"><span className="wt">What the symbols mean</span> <span className="sym">Δ<i>P</i></span> — the change in price (Δ, delta, always means "change in") &nbsp;·&nbsp; <span className="sym">λ</span> (lambda) — price impact per unit of flow: how many cents the price moves for each extra contract of one-sided pressure &nbsp;·&nbsp; <span className="sym">net order flow</span> — buy volume minus sell volume over the window. A small λ means a deep market that absorbs flow; a big λ means a shallow one where every trade moves the price.</span></div>
+
+<p><strong>λ (lambda)</strong> is the price impact per unit of flow — the inverse of market depth. Kyle showed λ rises with the variance of the true value and falls with the amount of noise trading: <em>the more uninformed flow there is to hide in, the deeper the market</em>. For a practitioner, λ is something to estimate continuously: when your fills start predicting price moves (your post-fill markouts go negative), the flow has turned toxic and your quotes are too tight.</p>
+
+<p>The simulation below makes adverse selection visceral. Noise traders hit your quotes at random — you collect the spread. Informed traders only hit you <em>just before the price jumps in their favor</em> — every informed fill is money out. Slide μ and watch the business die.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">simulation — adverse selection</span></div> <div className="fig-body"> <canvas id="cv-adv" height="220"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Informed flow μ: <b id="adv-mu-v">10%</b></label><input type="range" id="adv-mu" min="0" max="70" defaultValue="10" /></div> <div className="ctrl"><label>Half-spread: <b id="adv-hs-v">0.30</b></label><input type="range" id="adv-hs" min="5" max="120" defaultValue="30" /></div> <button className="btn" id="adv-reset">Restart</button> </div> <div className="readout"> <div className="r"><span className="k">Noise fills</span><span className="v pos" id="adv-n">0</span></div> <div className="r"><span className="k">Informed fills</span><span className="v neg" id="adv-i">0</span></div> <div className="r"><span className="k">P&amp;L</span><span className="v" id="adv-pnl">0.00</span></div> <div className="r"><span className="k">Verdict</span><span className="v" id="adv-verdict" style={{fontSize:'13px',maxWidth:'300px'}}>—</span></div> </div> </div> <div className="fig-cap">Yellow flashes are informed traders: they buy right before an up-jump and sell right before a down-jump, so each of their fills costs you roughly (jump − half-spread). Past a certain μ, no realistic spread saves you — the only correct move is to stop quoting. Remember this figure when we discuss tennis courtsiders in Chapter 8.</div> </div>
+
+### The complete anatomy of a spread
+
+<p>Empirically, real spreads decompose into three components — and this decomposition is your profitability audit:</p>
+
+<table><tbody> <tr><th>Component</th><th>Compensates for</th><th>Theory</th></tr> <tr><td><strong>Order-processing cost</strong></td><td>Fees, infrastructure, capital</td><td>—</td></tr> <tr><td><strong>Inventory risk premium</strong></td><td>Variance of held positions</td><td>Ho–Stoll · Avellaneda–Stoikov</td></tr> <tr><td><strong>Adverse-selection premium</strong></td><td>Trading against informed flow</td><td>Glosten–Milgrom · Kyle</td></tr> </tbody></table>
+
+<div className="keyidea"><span className="tag">The operational test</span>Measure your <strong>post-fill markout</strong>: the price change a few seconds after each of your fills. If markouts are systematically negative and bigger than your half-spread, adverse selection is eating you. No spread you can quote fixes informed flow — you fix it by quoting wider at dangerous moments, or not at all.</div>
+
+<FigRuntime chapter="ch5" />
+</div>

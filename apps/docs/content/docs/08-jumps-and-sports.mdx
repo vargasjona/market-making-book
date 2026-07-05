@@ -1,0 +1,36 @@
+---
+title: "8. Brownian Motion vs. Jump-Diffusion: Why Sports Break the Textbook"
+description: "Avellaneda–Stoikov assumes prices diffuse smoothly. A tennis market doesn't diffuse — it detonates, point by point."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part II · Chapter 8</div>
+
+### Two species of randomness
+
+<p>A liquid stock between news events moves in thousands of tiny increments — well-approximated by <strong>Brownian motion</strong>, the model under AS. An in-play sports contract is a different animal: the probability of "Alcaraz wins the match" barely drifts while a point is being played, then <strong>jumps</strong> the instant the point resolves. A break of serve, a wicket, a goal — each is a discontinuity. The correct model family is <strong>jump-diffusion</strong>: smooth diffusion punctuated by Poisson-arriving jumps of meaningful size.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">simulation — a stock vs. a tennis match</span></div> <div className="fig-body"> <canvas id="cv-jump" height="240"></canvas> <div className="ctrl-row"><button className="btn" id="jp-reset">Replay</button></div> </div> <div className="fig-cap">Left: Brownian diffusion — risk arrives continuously, in small doses. Right: an in-play match-winner contract — long quiet stretches, then violent jumps at scoring events (marked), converging inexorably to 0 or 1 at resolution. Note the late-match behavior: jumps get bigger near 50¢ and the path gets pinned near the boundaries — uncertainty dies as resolution approaches. That shrinking uncertainty is the vol crush.</div> </div>
+
+### Three structural facts about event-contract prices
+
+<ul> <li><strong>Prices are probabilities, bounded in [0,1].</strong> The natural coordinate is the log-odds, x = ln(p/(1−p)) — where p is the contract price read as a probability (a 65¢ contract is p = 0.65) and x is that same belief re-expressed on an unbounded scale, so equal moves in x mean equally "surprising" news anywhere on the price range; recent work (Dalen 2025, "Toward Black-Scholes for Prediction Markets") models x as a jump-diffusion martingale and re-derives AS-style quotes directly in logit space — skew and spread computed on x, then mapped back through p = 1/(1+e<sup>−x</sup>). This elegantly handles the boundary squeeze: a 2¢ move at p=0.50 and at p=0.95 are wildly different events in probability space, identical-looking in price space.</li> <li><strong>Time-to-resolution is an expiry.</strong> Like an option, an event contract has a clock. Belief volatility collapses to zero at resolution (vol crush), and with it the AS risk terms — your (T−t) is literal here, not a stylized end-of-day.</li> <li><strong>Inventory near resolution is unhedgeable.</strong> There is no underlying to delta-hedge with. Holding 500 YES at 90¢ in the fifth set is a position you exit through the order book or carry to settlement — nothing in between.</li> </ul>
+
+<p>The first fact — that price space lies near the boundaries — deserves a picture, because it changes how you set every spread and skew in this part of the book:</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — the logit lens: why 2¢ at 95¢ ≫ 2¢ at 50¢</span></div> <div className="fig-body"> <canvas id="cv-logit" height="240"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Contract price p: <b id="lg-p-v">80¢</b></label><input type="range" id="lg-p" min="3" max="97" defaultValue="80" /></div> </div> <div className="readout"> <div className="r"><span className="k">Log-odds x = ln(p/(1−p))</span><span className="v" id="lg-x">—</span></div> <div className="r"><span className="k">Belief shock of a ±2¢ move</span><span className="v" id="lg-dx">—</span></div> <div className="r"><span className="k">vs. the same 2¢ at 50¢</span><span className="v neg" id="lg-eq">—</span></div> </div> </div> <div className="fig-cap">The S-curve maps log-odds (belief space, horizontal) to price (vertical). Drag the marker toward 95¢: the same ±2¢ price band (vertical) projects onto a wider and wider slice of belief space (horizontal) — near the boundary, a tiny price move is an enormous information event. This is why quoting a flat 2¢ spread at every price is wrong twice: too timid at 50¢, suicidal at 95¢ — and why the AS machinery should run on x, not on p, with quotes mapped back through the logistic at the end.</div> </div>
+
+### The courtsider: adverse selection with a stopwatch
+
+<p>Sports markets host the purest predators in all of microstructure: <strong>courtsiders</strong> — people (or feeds) who learn the outcome of a point seconds before the exchange's data does. To them, your stale quote after a break point is free money. The empirical record is stark: a study of 141 Grand Slam matches on Betfair found cumulative abnormal returns of roughly <strong>3.56% within the ~5-second window after a set ends</strong> — a yawning chasm compared to the ~1% spreads you're trying to earn. Betting exchanges impose in-play delays of a few seconds precisely to blunt this.</p>
+
+<div className="warn"><span className="tag">The cardinal rule of in-play market making</span>Never leave quotes resting through a scoring event you haven't priced yet. The instant a point/wicket/goal occurs (or your jump detector fires): pull or widen massively, reprice with your model, then re-tighten. Your data latency relative to the fastest participant defines a danger window — during that window, your quotes are donations.</div>
+
+### The model-anchor principle
+
+<p>In diffusive markets your fair-value anchor can be the microprice — the book itself is informative. In event markets the book is <em>slower than the world</em>: the best anchor is an external <strong>model</strong> fed by the event stream. For tennis: a hierarchical Markov chain (point → game → set → match) in the O'Malley/Barnett tradition, parameterized by each player's serve-win probability — closed-form, microsecond-fast, updating discretely on every point. For cricket: ball-by-ball state models (runs, wickets, balls remaining). The market maker quotes around <em>model fair value</em>, inventory-skewed à la AS-in-logit, and treats disagreement between model and market as either edge or alarm.</p>
+
+<div className="keyidea"><span className="tag">The synthesis</span>Sports MM = (model-driven fair value in logit space) + (AS inventory skew with literal T−t) + (event-triggered quote pulling) + (maker-only fee discipline). Hold this sentence; it becomes Proposals A and B in Chapter 18.</div>
+
+<FigRuntime chapter="ch8" />
+</div>

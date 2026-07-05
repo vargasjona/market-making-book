@@ -1,0 +1,30 @@
+---
+title: "9. Kalshi: Regulated Event Contracts"
+description: "A CFTC-regulated exchange where every market is a binary probability — and the fee curve is the strategy."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part III · Chapter 9</div>
+
+<div className="vmeta"> <div className="vm"><span className="k">Instrument</span><div className="v">Binary YES/NO, settle $0 or $1</div></div> <div className="vm"><span className="k">Identity</span><div className="v">YES + NO = $1.00</div></div> <div className="vm"><span className="k">Regulation</span><div className="v">CFTC (US legal)</div></div> <div className="vm"><span className="k">Taker fee</span><div className="v">⌈0.07·C·p·(1−p)⌉</div></div> <div className="vm"><span className="k">Maker fee</span><div className="v">0 on most markets*</div></div> <div className="vm"><span className="k">API</span><div className="v">REST · WebSocket · FIX (FIXT.1.1 / FIX50SP2)</div></div> </div>
+
+<p className="small">*Some series — notably the S&amp;P 500 / Nasdaq-100 index markets — carry maker fees: since July 2025 a quadratic schedule of ⌈0.0175·C·p·(1−p)⌉, exactly a quarter of the taker fee (it replaced the old flat 0.25¢-per-contract maker fee). Those same index series also take at a halved 0.035 multiplier. Kalshi's 2025 fee-generating volume: $22.9B, with sports ≈ 89% of fee revenue; the venue raised $1B at a $22B valuation in May 2026 and was reportedly seeking ~$40B by June 2026 — young terrain, fast-changing rules. Always re-read the fee schedule.</p>
+
+### The mechanics that matter
+
+<ul> <li><strong>One book, two views.</strong> The book stores YES bids and NO bids; a YES bid at 7¢ <em>is</em> a NO ask at 93¢. "Buying NO" and "selling YES" are the same act.</li> <li><strong>Prices are probabilities.</strong> 1¢–99¢, tick = 1¢ (with finer sub-penny structures rolling out via <code>price_ranges[].step</code>).</li> <li><strong>MM-friendly API.</strong> Amend Order (keep the order's identity; note the fine print — <em>only a size decrease preserves your FIFO spot; a reprice goes to the back of the queue</em>, Ch. 7), batch create/cancel, queue-position endpoint (you can <em>see</em> your FIFO position), self-trade prevention modes (<code>taker_at_cross</code> / <code>maker</code>), <code>cancel_order_on_pause</code>. These exist because Kalshi wants makers.</li> <li><strong>Idle cash earns interest</strong> (3.25% APY, variable — and it accrues on open-position collateral too), softening the cost of parked capital.</li> </ul>
+
+### The taker fee: a parabola that designs your strategy for you
+
+<p>Kalshi's taker fee per contract is 0.07·p·(1−p) — a parabola peaking exactly at p = 50¢, where it costs ~1.75¢ per contract. Explore it:</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — kalshi taker fee curve</span></div> <div className="fig-body"> <canvas id="cv-fee" height="220"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Contract price p: <b id="fee-p-v">50¢</b></label><input type="range" id="fee-p" min="1" max="99" defaultValue="50" /></div> </div> <div className="readout"> <div className="r"><span className="k">Taker fee / contract</span><span className="v neg" id="fee-f">—</span></div> <div className="r"><span className="k">As % of price</span><span className="v" id="fee-pct">—</span></div> <div className="r"><span className="k">Ticks of spread eaten</span><span className="v" id="fee-ticks">—</span></div> </div> </div> <div className="fig-cap">At 50¢ a round trip as taker costs ~3.5¢ — more than the entire 1–2¢ spread you were hoping to earn. The shaded 30–70¢ band is where two-sided quoting is attractive (real uncertainty, real flow, workable spread-to-tick ratio); the parabola is why <strong>maker-only is not a preference on Kalshi — it's a law of survival</strong>.</div> </div>
+
+### Why quote only the 30–70¢ band?
+
+<ul> <li><strong>Tail asymmetry:</strong> sell a 95¢ YES that resolves against you and you lose 95¢ to win 5¢ — one informed counterparty erases 19 good trades.</li> <li><strong>Tick coarseness:</strong> at 3¢, one tick is 33% of the price; spreads can't compress to fair levels.</li> <li><strong>Flow quality:</strong> the center is where genuine two-way uncertainty (and noise flow) lives; the tails attract precisely the flow that knows something.</li> </ul>
+
+<div className="keyidea"><span className="tag">Kalshi MM doctrine</span>Maker-only, center-band, model-anchored, queue-aware (shrink in place when you can; accept that any reprice pays the back-of-queue toll), with hard inventory caps per market. The venue's API was practically designed for this playbook. (One 2026 footnote: Kalshi now also lists perpetual futures — everything in this chapter is about its event contracts.)</div>
+
+<FigRuntime chapter="ch9" />
+</div>

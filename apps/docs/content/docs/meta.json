@@ -1,0 +1,32 @@
+{
+  "title": "The Market Making Book",
+  "pages": [
+    "index",
+    "---Part I — Foundations---",
+    "01-trading-from-zero",
+    "02-traders-toolkit",
+    "03-what-is-a-market-maker",
+    "04-history",
+    "---Part II — Theory---",
+    "05-inventory-risk-adverse-selection",
+    "06-optimal-quoting-math",
+    "07-microstructure-signals",
+    "08-jumps-and-sports",
+    "---Part III — Venues---",
+    "09-kalshi",
+    "10-polymarket",
+    "11-hyperliquid",
+    "12-binance",
+    "13-ibkr-alpaca",
+    "---Part IV — Strategy---",
+    "14-algorithm-market-fit",
+    "15-algorithm-catalog",
+    "16-risk-and-operations",
+    "17-crypto-mm-in-practice",
+    "---Part V — Frontier---",
+    "18-six-proposals",
+    "19-references",
+    "---Appendix---",
+    "20-glossary"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "market-making-book",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "check-types": "turbo run check-types",
+    "check": "ultracite check",
+    "fix": "ultracite fix"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.16",
+    "@market-making-book/config": "workspace:*",
+    "@types/node": "^22.13.14",
+    "lefthook": "latest",
+    "turbo": "^2.10.2",
+    "typescript": "^6",
+    "ultracite": "7.8.4"
+  },
+  "packageManager": "bun@1.3.13"
+}

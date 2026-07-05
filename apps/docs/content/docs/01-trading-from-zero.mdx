@@ -1,0 +1,54 @@
+---
+title: "1. Trading from Zero"
+description: "Before you can make a market, you must understand the machine where markets live: the limit order book."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part I · Chapter 1</div>
+
+### Prices are not a number — they are two numbers
+
+<p>Open any trading app and you'll see "BTC: $97,431". That single number is a convenient fiction. At any instant a market really has <strong>two</strong> prices:</p>
+
+<ul> <li>The <strong style={{color:'var(--bid)'}}>bid</strong> — the highest price anyone is currently willing to <em>pay</em>. If you want to sell instantly, this is what you get.</li> <li>The <strong style={{color:'var(--ask)'}}>ask</strong> (or offer) — the lowest price anyone is currently willing to <em>accept</em>. If you want to buy instantly, this is what you pay.</li> </ul>
+
+<p>The gap between them is the <strong>bid-ask spread</strong>. The "price" your app shows is usually just the midpoint. The spread is not an inefficiency — it is the <em>price of immediacy</em>, and it is precisely where the market maker's revenue lives.</p>
+
+<div className="parable"><span className="tag">Parable · The airport currency kiosk</span> A currency exchange kiosk buys euros at $1.05 and sells euros at $1.09. Nobody calls this a scam — the kiosk provides a service: you can exchange <em>right now</em>, any time, without finding another traveler who wants the opposite trade. The 4¢ gap pays for that service. A market maker is exactly this kiosk, quoting thousands of times per second.</div>
+
+### The limit order book
+
+<p>Modern electronic markets organize all outstanding intentions to trade in a <strong>limit order book</strong> (LOB, or CLOB — central limit order book). There are two kinds of orders:</p>
+
+<ul> <li>A <strong>limit order</strong> states a price and waits: "I will buy 10 contracts at 47¢ or better." It <em>adds</em> liquidity to the book and rests there until matched or cancelled. The person posting it is called a <strong>maker</strong>.</li> <li>A <strong>market order</strong> demands immediate execution at the best available price: "buy 10 now, whatever it costs." It <em>removes</em> liquidity. The person sending it is a <strong>taker</strong>.</li> </ul>
+
+<p>Orders at the same price are usually filled in arrival order — <strong>price-time priority</strong> (FIFO). Your position in the queue at a price level matters enormously; we'll return to this in Chapter 7. Some options exchanges instead use <strong>pro-rata</strong> allocation, splitting fills proportionally to order size.</p>
+
+<p>Try it. The figure below is a working order book. Press the buttons and watch what happens to the book, the spread, and the fees you pay or earn.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — order book simulator</span></div> <div className="fig-body"> <div id="ob-wrap"></div> <div className="ctrl-row" style={{marginTop:'14px'}}> <button className="btn buy" id="ob-mbuy">Market BUY (taker)</button> <button className="btn sell" id="ob-msell">Market SELL (taker)</button> <button className="btn" id="ob-lbid">Post limit bid (maker)</button> <button className="btn" id="ob-lask">Post limit ask (maker)</button> <button className="btn" id="ob-reset">Reset</button> </div> <div className="readout"> <div className="r"><span className="k">Best bid</span><span className="v" id="ob-bb">—</span></div> <div className="r"><span className="k">Best ask</span><span className="v" id="ob-ba">—</span></div> <div className="r"><span className="k">Spread</span><span className="v" id="ob-sp">—</span></div> <div className="r"><span className="k">Last event</span><span className="v" id="ob-log" style={{fontSize:'13px',maxWidth:'340px'}}>Click a button to trade.</span></div> </div> </div> <div className="fig-cap">Green rows are resting bids, red rows are resting asks; bar length is size at that price. Your own maker orders are marked YOU and glow amber. Market orders eat the opposite side of the book — and pay the spread for the privilege. Background traders occasionally fill your resting orders.</div> </div>
+
+### Makers, takers, and who pays whom
+
+<p>Because resting limit orders are what make instant trading possible, most venues price the two roles differently. In a <strong>maker-taker</strong> fee model, takers pay a fee and makers pay less, zero, or even receive a <strong>rebate</strong>. This asymmetry is not a detail — for a market maker, fee structure frequently decides whether a strategy is viable at all. On Kalshi (Chapter 9), the taker fee alone makes naive strategies unprofitable; on Binance (Chapter 12), reaching a fee tier with maker rebates can flip the sign of your P&amp;L.</p>
+
+### Liquidity
+
+<p>A market is <strong>liquid</strong> when you can trade a large size quickly without moving the price much. Concretely, liquidity is: a tight spread, deep size resting at each price level, and fast replenishment after trades. Market makers <em>are</em> the liquidity in most modern markets — when they pull their quotes (as they did on May 6, 2010 — Chapter 4), liquidity evaporates in seconds.</p>
+
+### Depth and slippage: walking the book
+
+<p>The spread measures the cost of trading <em>one</em> contract. For anything bigger, the second dimension of liquidity takes over: <strong>depth</strong> — how much size rests at each level. A market order larger than the best level's size doesn't stop there; it <strong>walks the book</strong>, consuming level after level at progressively worse prices. The gap between the price you expected (the mid, or the best quote) and the average price you actually got is <strong>slippage</strong> — and it grows faster than linearly, because books usually thin out away from the touch.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — a market order walking the book</span></div> <div className="fig-body"> <canvas id="cv-walk" height="240"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Market buy size: <b id="wk-size-v">100</b> contracts</label><input type="range" id="wk-size" min="50" max="3600" step="50" defaultValue="100" /></div> </div> <div className="readout"> <div className="r"><span className="k">Avg fill price</span><span className="v" id="wk-avg">—</span></div> <div className="r"><span className="k">Slippage vs mid (50¢)</span><span className="v neg" id="wk-slip">—</span></div> <div className="r"><span className="k">Levels swept</span><span className="v" id="wk-lvls">—</span></div> <div className="r"><span className="k">Unfilled</span><span className="v" id="wk-left">0</span></div> </div> </div> <div className="fig-cap">Each red bar is resting ask size at a price; the amber portion is what your buy order consumes. Drag the size up: a 100-lot fills at the touch, a 1,500-lot pays a full cent more on average, and past the book's total depth the order simply can't fill. This curve — average price as a function of size — is the true price list of a market, and the spread is only its first entry.</div> </div>
+
+<p>Slippage is why nobody serious sends size in one order: large traders <strong>slice</strong> parent orders into small children spread over time (the VWAP/TWAP algos of Chapter 2), and why Kyle's λ in Chapter 5 — price impact per unit of flow — is the single number that summarizes a market's depth. For the market maker, depth is also a defensive instrument: how much you quote at each level decides how much a sweep can hurt you.</p>
+
+### Long, short, and inventory
+
+<p>You're <strong>long</strong> when you own the asset and profit if it rises; <strong>short</strong> when you've sold what you didn't own (or sold a contract) and profit if it falls. A market maker's net position at any moment is their <strong>inventory</strong>, usually written <span className="eq" style={{display:'inline',padding:'2px 8px',margin:'0'}}><i>q</i></span>. The entire mathematical theory of Part II revolves around one question: <em>how should my quotes change as my inventory grows?</em></p>
+
+<div className="keyidea"><span className="tag">What you now know</span>Markets have two prices; the gap is the spread. Makers post resting limit orders and supply liquidity; takers cross the spread and consume it. Fees treat the two roles differently. The market maker's state variable is inventory. Next we add the layer every trading platform paints on top of this machinery — charts, candles, and indicators — and learn what each one looks like from the maker's side of the glass.</div>
+
+<FigRuntime chapter="ch1" />
+</div>

@@ -1,0 +1,44 @@
+---
+title: "3. What Is a Market Maker?"
+description: "A merchant of immediacy: always willing to buy, always willing to sell, and paid the spread for never saying no."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part I · Chapter 3</div>
+
+<p>A <strong>market maker</strong> (MM) simultaneously posts a bid and an ask in the same instrument, hoping to buy at the bid, sell at the ask, and capture the spread — over and over. The MM doesn't try to predict where the price is going; it tries to be the counterparty to everyone else's impatience.</p>
+
+<div className="parable"><span className="tag">Parable · The fruit vendor</span> Rosa runs a fruit stall. She buys apples from anyone at $0.95 and sells to anyone at $1.05. On a good day, farmers and snackers arrive in roughly equal numbers and she earns 10¢ per round trip, hundreds of times. But two things keep Rosa up at night. <strong>One:</strong> some afternoons only farmers show up — she ends the day buried in apples, and if tomorrow's apple price drops, her pile loses value. <strong>Two:</strong> sometimes the person selling her apples is an agronomist who <em>knows</em> a record harvest will crash prices tomorrow. Rosa's two fears have formal names: <strong>inventory risk</strong> and <strong>adverse selection</strong>. Every formula in this book is a way of pricing one of Rosa's fears.</div>
+
+<p>Watch Rosa's business below as a simulation: a mid-price that drifts randomly, quotes around it, traders arriving at random and hitting either side.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">simulation — earning the spread</span></div> <div className="fig-body"> <canvas id="cv-spread" height="220"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Half-spread: <b id="sl-hs-v">0.30</b></label><input type="range" id="sl-hs" min="5" max="120" defaultValue="30" /></div> <div className="ctrl"><label>Volatility: <b id="sl-vol-v">1.0</b></label><input type="range" id="sl-vol" min="2" max="30" defaultValue="10" /></div> <button className="btn" id="sp-reset">Restart</button> </div> <div className="readout"> <div className="r"><span className="k">Round trips</span><span className="v" id="sp-rt">0</span></div> <div className="r"><span className="k">Inventory q</span><span className="v" id="sp-q">0</span></div> <div className="r"><span className="k">Spread P&amp;L</span><span className="v pos" id="sp-pnl1">0.00</span></div> <div className="r"><span className="k">Inventory P&amp;L</span><span className="v" id="sp-pnl2">0.00</span></div> <div className="r"><span className="k">Total</span><span className="v" id="sp-tot">0.00</span></div> </div> </div> <div className="fig-cap">Tighten the spread: more fills, smaller margin per fill. Raise volatility: inventory P&amp;L starts to swing your total around — the spread income is steady, but the value of what you're holding is not. That swing is inventory risk made visible.</div> </div>
+
+### The two P&amp;L streams
+
+<p>The figure splits the MM's profit into the two streams every desk monitors separately:</p>
+
+<ul> <li><strong>Spread P&amp;L</strong> — the accumulated half-spreads from every fill. Steady, almost mechanical income. This is the business.</li> <li><strong>Inventory P&amp;L</strong> — the mark-to-market change of whatever you happen to be holding. Pure noise at best, a slow bleed at worst. This is the risk.</li> </ul>
+
+<p>A good market making operation maximizes the first stream while strangling the variance of the second. Notice in the simulation that inventory drifts away from zero on its own — random fills don't balance perfectly. Left unmanaged, the position grows like a drunkard's walk, and with it your exposure. Chapter 6 derives <em>exactly</em> how much you should shade your quotes to push inventory back toward zero.</p>
+
+### The economics of one round trip
+
+<p>It pays to write the business down as an accountant would. One <strong>round trip</strong> — buy at the bid, later sell at the ask — earns the spread, minus everything that happened in between:</p>
+
+<div className="eq"><span className="lbl">P&amp;L of one round trip</span> E[P&amp;L] = spread &nbsp;−&nbsp; 2·fees &nbsp;−&nbsp; E[adverse move while holding] &nbsp;−&nbsp; hedging costs <span className="where"><span className="wt">What the symbols mean</span> <span className="sym">E[·]</span> — "expected value": the <em>average</em> over many repetitions, not what any single trade does &nbsp;·&nbsp; <span className="sym">spread</span> — what you pocket by buying at your bid and selling at your ask &nbsp;·&nbsp; <span className="sym">2·fees</span> — the venue charges you twice, once per side of the trip &nbsp;·&nbsp; <span className="sym">adverse move</span> — how much the price drifts against you, on average, while you're stuck holding the position &nbsp;·&nbsp; <span className="sym">hedging costs</span> — what you pay (fees + crossing the spread elsewhere) if you offload the risk on another venue.</span></div>
+
+<p>Each negative term gets its own chapter: fees are venue terrain (Part III), the adverse move splits into inventory risk and adverse selection (Chapter 5), and the time you spend holding — which scales the adverse-move term — is exactly what the mathematics of Chapter 6 minimizes. Two further subtleties hide in the word "round trip":</p>
+
+<ul> <li><strong>Round trips require both sides to fill.</strong> In a balanced, mean-reverting market they do, constantly. In a trending market only one side fills — there is no round trip, just a growing position. The trend doesn't reduce your income; it converts your business from spread-collection into an unintended directional bet.</li> <li><strong>The halves of the trip are not independent.</strong> The fill that opens your position is more likely to arrive precisely when the price is about to move against you (Chapter 5 makes this rigorous). Averaging "spread per round trip" over good days hides the bad fills that never closed.</li> </ul>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — the round-trip waterfall</span></div> <div className="fig-body"> <canvas id="cv-rt" height="230"></canvas> <div className="ctrl-row"> <div className="ctrl"><label>Spread captured: <b id="rt-spr-v">2.0¢</b></label><input type="range" id="rt-spr" min="0" max="40" defaultValue="20" /></div> <div className="ctrl"><label>Fee per side: <b id="rt-fee-v">0.3¢</b></label><input type="range" id="rt-fee" min="0" max="20" defaultValue="3" /></div> <div className="ctrl"><label>Adverse move: <b id="rt-adv-v">0.8¢</b></label><input type="range" id="rt-adv" min="0" max="30" defaultValue="8" /></div> <div className="ctrl"><label>Hedging cost: <b id="rt-hdg-v">0.2¢</b></label><input type="range" id="rt-hdg" min="0" max="15" defaultValue="2" /></div> </div> <div className="readout"> <div className="r"><span className="k">Net per round trip</span><span className="v" id="rt-net">—</span></div> <div className="r"><span className="k">Verdict</span><span className="v" id="rt-verdict" style={{fontSize:'13px',maxWidth:'340px'}}>—</span></div> </div> </div> <div className="fig-cap">The whole business on one chart: the spread builds the only green bar, and every cost takes its bite. Now run the venue thought-experiments: set fees to a Kalshi taker's (~1.75¢ per side at 50¢ — the green bar drowns instantly: that's why Chapter 9 says maker-only); crank the adverse move to a courtsider's jump and watch no realistic spread survive. Profitable market making is not finding a magic spread — it's keeping three red bars short.</div> </div>
+
+### Why someone pays you the spread
+
+<p>Takers cross the spread because immediacy is worth more to them than the spread costs: a hedger needs the position now, a retail trader doesn't care about 1¢, an arbitrageur is locking a larger profit elsewhere. As long as a healthy share of the flow trades for reasons <em>other than superior information</em>, the kiosk business works. The moment most of your counterparties know something you don't, you are no longer a kiosk — you are the sucker at the table. That's Chapter 5.</p>
+
+<div className="keyidea"><span className="tag">Definition worth memorizing</span>Market making = short-volatility-flavored income (the spread) funded by providing immediacy, taxed by two costs: the variance of your inventory and the information of your counterparties.</div>
+
+<FigRuntime chapter="ch3" />
+</div>
