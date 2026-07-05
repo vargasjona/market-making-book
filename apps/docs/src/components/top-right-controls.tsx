@@ -1,10 +1,12 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { BookLogo } from "@/components/book-logo";
 import { ThemeCustomizer } from "@/components/theme-customizer";
-import { gitConfig } from "@/lib/shared";
+import { appName, gitConfig } from "@/lib/shared";
 
 const buttonClass =
 	"flex size-9 items-center justify-center rounded-full border bg-fd-popover/80 text-fd-muted-foreground backdrop-blur transition-colors hover:text-fd-foreground";
@@ -54,7 +56,7 @@ function ThemeToggleButton() {
  */
 export function TopRightControls() {
 	return (
-		<div className="fixed top-3 right-4 z-40 flex items-center gap-1.5 max-lg:hidden">
+		<div className="fixed top-3 right-4 z-40 flex items-center gap-1.5 max-lg:hidden [[data-ai-chat-open]_&]:hidden">
 			<GithubButton />
 			<ThemeToggleButton />
 			<ThemeCustomizer />
@@ -75,6 +77,26 @@ export function MobileNavControls() {
 				<ThemeToggleButton />
 				<ThemeCustomizer />
 			</div>
+		</div>
+	);
+}
+
+/**
+ * Banner for the docs sidebar on mobile: book logo + name linking home,
+ * with the nav controls row underneath. The home layout navbar already
+ * shows the title, so it keeps using plain MobileNavControls.
+ */
+export function MobileSidebarBanner() {
+	return (
+		<div className="flex flex-col gap-3 lg:hidden">
+			<Link
+				className="inline-flex items-center gap-2.5 font-medium text-fd-foreground"
+				href="/"
+			>
+				<BookLogo />
+				{appName}
+			</Link>
+			<MobileNavControls />
 		</div>
 	);
 }

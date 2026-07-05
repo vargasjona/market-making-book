@@ -7,7 +7,7 @@ import {
 	AISearchPanel,
 	AISearchTrigger,
 } from "@/components/ai/search";
-import { MobileNavControls } from "@/components/top-right-controls";
+import { MobileSidebarBanner } from "@/components/top-right-controls";
 import { cn } from "@/lib/cn";
 import { baseOptions } from "@/lib/layout.shared";
 import { source } from "@/lib/source";
@@ -15,7 +15,7 @@ import { source } from "@/lib/source";
 export default function Layout({ children }: LayoutProps<"/docs">) {
 	return (
 		<DocsLayout
-			sidebar={{ banner: <MobileNavControls key="mobile-nav-controls" /> }}
+			sidebar={{ banner: <MobileSidebarBanner key="mobile-sidebar-banner" /> }}
 			tree={source.getPageTree()}
 			{...baseOptions()}
 		>

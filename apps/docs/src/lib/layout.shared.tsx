@@ -1,4 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { BookLogo } from "@/components/book-logo";
 import { appName } from "./shared";
 
 // GitHub link + theme toggle live in the top-right corner instead
@@ -6,8 +7,12 @@ import { appName } from "./shared";
 export function baseOptions(): BaseLayoutProps {
 	return {
 		nav: {
-			// JSX supported
-			title: appName,
+			title: (
+				<>
+					<BookLogo className="size-5" />
+					<span className="whitespace-nowrap text-sm">{appName}</span>
+				</>
+			),
 		},
 		themeSwitch: {
 			enabled: false,

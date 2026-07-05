@@ -374,6 +374,15 @@ export function AISearch({ children }: { children: ReactNode }) {
 		}),
 	});
 
+	// Signals open state to elements outside this context, e.g. the floating
+	// top-right controls hide themselves so they don't cover the panel header.
+	useEffect(() => {
+		document.documentElement.toggleAttribute("data-ai-chat-open", open);
+		return () => {
+			document.documentElement.removeAttribute("data-ai-chat-open");
+		};
+	}, [open]);
+
 	return (
 		<Context value={useMemo(() => ({ chat, open, setOpen }), [chat, open])}>
 			{children}
