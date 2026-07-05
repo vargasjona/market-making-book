@@ -4,184 +4,184 @@
 
 /* ---------- accent palettes (light / dark) ---------- */
 :root {
-  --mm-primary: #ea580c; /* orange-600 — default */
-  --mm-primary-fg: #ffffff;
+	--mm-primary: #ea580c; /* orange-600 — default */
+	--mm-primary-fg: #ffffff;
 }
 .dark {
-  --mm-primary: #f97316; /* orange-500 */
-  --mm-primary-fg: #431407;
+	--mm-primary: #f97316; /* orange-500 */
+	--mm-primary-fg: #431407;
 }
 :root[data-accent="rose"] {
-  --mm-primary: #e11d48;
-  --mm-primary-fg: #fff;
+	--mm-primary: #e11d48;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="rose"] {
-  --mm-primary: #fb7185;
-  --mm-primary-fg: #4c0519;
+	--mm-primary: #fb7185;
+	--mm-primary-fg: #4c0519;
 }
 :root[data-accent="red"] {
-  --mm-primary: #dc2626;
-  --mm-primary-fg: #fff;
+	--mm-primary: #dc2626;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="red"] {
-  --mm-primary: #f87171;
-  --mm-primary-fg: #450a0a;
+	--mm-primary: #f87171;
+	--mm-primary-fg: #450a0a;
 }
 :root[data-accent="yellow"] {
-  --mm-primary: #ca8a04;
-  --mm-primary-fg: #fff;
+	--mm-primary: #ca8a04;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="yellow"] {
-  --mm-primary: #facc15;
-  --mm-primary-fg: #422006;
+	--mm-primary: #facc15;
+	--mm-primary-fg: #422006;
 }
 :root[data-accent="gray"] {
-  --mm-primary: #4b5563;
-  --mm-primary-fg: #fff;
+	--mm-primary: #4b5563;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="gray"] {
-  --mm-primary: #9ca3af;
-  --mm-primary-fg: #111827;
+	--mm-primary: #9ca3af;
+	--mm-primary-fg: #111827;
 }
 :root[data-accent="stone"] {
-  --mm-primary: #57534e;
-  --mm-primary-fg: #fff;
+	--mm-primary: #57534e;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="stone"] {
-  --mm-primary: #a8a29e;
-  --mm-primary-fg: #1c1917;
+	--mm-primary: #a8a29e;
+	--mm-primary-fg: #1c1917;
 }
 :root[data-accent="green"] {
-  --mm-primary: #16a34a;
-  --mm-primary-fg: #fff;
+	--mm-primary: #16a34a;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="green"] {
-  --mm-primary: #4ade80;
-  --mm-primary-fg: #052e16;
+	--mm-primary: #4ade80;
+	--mm-primary-fg: #052e16;
 }
 :root[data-accent="blue"] {
-  --mm-primary: #2563eb;
-  --mm-primary-fg: #fff;
+	--mm-primary: #2563eb;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="blue"] {
-  --mm-primary: #60a5fa;
-  --mm-primary-fg: #172554;
+	--mm-primary: #60a5fa;
+	--mm-primary-fg: #172554;
 }
 :root[data-accent="violet"] {
-  --mm-primary: #7c3aed;
-  --mm-primary-fg: #fff;
+	--mm-primary: #7c3aed;
+	--mm-primary-fg: #fff;
 }
 .dark[data-accent="violet"] {
-  --mm-primary: #a78bfa;
-  --mm-primary-fg: #2e1065;
+	--mm-primary: #a78bfa;
+	--mm-primary-fg: #2e1065;
 }
 
 /* ---------- wire accent into fumadocs ---------- */
 :root,
 .dark {
-  --color-fd-primary: var(--mm-primary);
-  --color-fd-primary-foreground: var(--mm-primary-fg);
-  --color-fd-ring: var(--mm-primary);
+	--color-fd-primary: var(--mm-primary);
+	--color-fd-primary-foreground: var(--mm-primary-fg);
+	--color-fd-ring: var(--mm-primary);
 }
 
 /* ---------- parchment light mode (not white — pergamino) ---------- */
 :root:not(.dark) {
-  --color-fd-background: #faf6ee;
-  --color-fd-popover: #fffdf7;
-  --color-fd-popover-foreground: #2a2419;
-  --color-fd-card: #f5f0e4;
-  --color-fd-card-foreground: #18222f;
-  --color-fd-border: rgba(94, 78, 50, 0.16);
-  --color-fd-muted: #f1ebdd;
-  --color-fd-muted-foreground: #71685a;
-  --color-fd-secondary: #f2ecdf;
-  --color-fd-secondary-foreground: #2a2419;
-  --color-fd-accent: rgba(214, 199, 168, 0.35);
-  --color-fd-accent-foreground: #2a2419;
+	--color-fd-background: #faf6ee;
+	--color-fd-popover: #fffdf7;
+	--color-fd-popover-foreground: #2a2419;
+	--color-fd-card: #f5f0e4;
+	--color-fd-card-foreground: #18222f;
+	--color-fd-border: rgba(94, 78, 50, 0.16);
+	--color-fd-muted: #f1ebdd;
+	--color-fd-muted-foreground: #71685a;
+	--color-fd-secondary: #f2ecdf;
+	--color-fd-secondary-foreground: #2a2419;
+	--color-fd-accent: rgba(214, 199, 168, 0.35);
+	--color-fd-accent-foreground: #2a2419;
 }
 
 /* ---------- accent-tinted backdrop glow (TurboStarter style) ---------- */
 body {
-  background-color: var(--color-fd-background);
-  background-image:
-    radial-gradient(
-      50% 36% at 78% 0%,
-      color-mix(in oklab, var(--mm-primary) 13%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      36% 28% at 12% 4%,
-      color-mix(in oklab, var(--mm-primary) 6%, transparent),
-      transparent 70%
-    );
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+	background-color: var(--color-fd-background);
+	background-image:
+		radial-gradient(
+			50% 36% at 78% 0%,
+			color-mix(in oklab, var(--mm-primary) 13%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			36% 28% at 12% 4%,
+			color-mix(in oklab, var(--mm-primary) 6%, transparent),
+			transparent 70%
+		);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
 }
 
 /* ---------- book pages: blend into the parchment theme ---------- */
 /* The book's accent-driven elements follow the selected theme accent, and
    the chapter sits directly on the page background in both modes. */
 .mm-book {
-  --accent: var(--mm-primary);
-  padding: 0;
-  background: transparent;
-  border-radius: 0;
+	--accent: var(--mm-primary);
+	padding: 0;
+	background: transparent;
+	border-radius: 0;
 }
 .mm-book .keyidea {
-  background: color-mix(in oklab, var(--mm-primary) 9%, #fffdf7);
+	background: color-mix(in oklab, var(--mm-primary) 9%, #fffdf7);
 }
 
 /* Fumadocs wraps headings in anchor links; keep headings ink, not accent. */
 .mm-book :is(h2, h3, h4) a {
-  color: inherit;
+	color: inherit;
 }
 /* Inline elements inherit the book ink instead of the prose theme color. */
 .mm-book :is(strong, b, em, code) {
-  color: inherit;
+	color: inherit;
 }
 .mm-book code {
-  padding: 1px 5px;
-  background: rgba(24, 34, 47, 0.06);
-  border-radius: 4px;
+	padding: 1px 5px;
+	background: rgba(24, 34, 47, 0.06);
+	border-radius: 4px;
 }
 
 /* ---------- true dark reading mode for the book content ---------- */
 /* Remap the book's ink/paper palette to warm dark equivalents. The canvas
    figures are dark-native already and blend in unchanged. */
 .dark .mm-book {
-  --ink: #ede7da;
-  --ink-soft: #c2b8a6;
-  --ink-faint: #8f8674;
-  --paper: #14110c;
-  --paper-2: #1e1912;
-  --bid: #5bd3a2;
-  --bid-soft: #12271e;
-  --ask: #f08a7e;
-  --ask-soft: #2a1512;
-  color: var(--ink);
+	--ink: #ede7da;
+	--ink-soft: #c2b8a6;
+	--ink-faint: #8f8674;
+	--paper: #14110c;
+	--paper-2: #1e1912;
+	--bid: #5bd3a2;
+	--bid-soft: #12271e;
+	--ask: #f08a7e;
+	--ask-soft: #2a1512;
+	color: var(--ink);
 }
 .dark .mm-book .keyidea {
-  background: color-mix(in oklab, var(--mm-primary) 14%, #17130d);
+	background: color-mix(in oklab, var(--mm-primary) 14%, #17130d);
 }
 .dark .mm-book :is(.eq, .vm, .algo, .badge, .tl-item.open, .gl-search) {
-  background: #1a1610;
-  border-color: #37301f;
+	background: #1a1610;
+	border-color: #37301f;
 }
 .dark .mm-book .eq .where {
-  border-top-color: #37301f;
+	border-top-color: #37301f;
 }
 .dark .mm-book :is(td, .gl-item) {
-  border-bottom-color: #37301f;
+	border-bottom-color: #37301f;
 }
 .dark .mm-book tr:hover td {
-  background: #211c13;
+	background: #211c13;
 }
 .dark .mm-book .timeline {
-  border-left-color: #37301f;
+	border-left-color: #37301f;
 }
 .dark .mm-book .tl-item:hover {
-  background: #211c13;
+	background: #211c13;
 }
 .dark .mm-book code {
-  background: rgba(237, 231, 218, 0.09);
+	background: rgba(237, 231, 218, 0.09);
 }

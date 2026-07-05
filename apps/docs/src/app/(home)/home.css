@@ -1,0 +1,158 @@
+/* Landing-page animations. Every animation is decorative and disabled under
+ * prefers-reduced-motion. */
+
+@keyframes home-rise {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.home-rise {
+	animation: home-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.home-rise-1 {
+	animation-delay: 0.05s;
+}
+.home-rise-2 {
+	animation-delay: 0.15s;
+}
+.home-rise-3 {
+	animation-delay: 0.25s;
+}
+.home-rise-4 {
+	animation-delay: 0.35s;
+}
+.home-rise-5 {
+	animation-delay: 0.5s;
+}
+
+/* Order-book depth bars: each row's liquidity bar breathes at its own pace. */
+@keyframes home-depth {
+	0%,
+	100% {
+		transform: scaleX(0.55);
+	}
+	35% {
+		transform: scaleX(1);
+	}
+	70% {
+		transform: scaleX(0.78);
+	}
+}
+
+.home-depth {
+	transform-origin: left;
+	animation: home-depth 3.4s ease-in-out infinite;
+}
+
+.home-depth-1 {
+	animation-duration: 2.6s;
+}
+.home-depth-2 {
+	animation-duration: 3.1s;
+	animation-delay: 0.4s;
+}
+.home-depth-3 {
+	animation-duration: 3.7s;
+	animation-delay: 0.9s;
+}
+.home-depth-4 {
+	animation-duration: 2.9s;
+	animation-delay: 1.3s;
+}
+.home-depth-5 {
+	animation-duration: 3.5s;
+	animation-delay: 0.2s;
+}
+
+/* Mid-price flash: ticks green, settles, ticks red, settles. */
+@keyframes home-flash {
+	0%,
+	38%,
+	88%,
+	100% {
+		color: inherit;
+	}
+	8%,
+	22% {
+		color: #10b981;
+	}
+	58%,
+	72% {
+		color: #f43f5e;
+	}
+}
+
+.home-flash {
+	animation: home-flash 7s ease-in-out infinite;
+}
+
+/* Pulsing "live" dot. */
+@keyframes home-ping {
+	from {
+		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55);
+	}
+	to {
+		box-shadow: 0 0 0 9px rgba(16, 185, 129, 0);
+	}
+}
+
+.home-dot {
+	animation: home-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Gentle float for the order-book card. */
+@keyframes home-float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-8px);
+	}
+}
+
+.home-float {
+	animation: home-float 7s ease-in-out infinite;
+}
+
+/* Topics ticker: the track holds two copies of the list, so -50% loops seamlessly. */
+@keyframes home-marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+.home-marquee {
+	animation: home-marquee 36s linear infinite;
+}
+
+.home-marquee:hover {
+	animation-play-state: paused;
+}
+
+/* Accent glow behind the hero, driven by the user-selectable accent color. */
+.home-glow {
+	background: radial-gradient(
+		closest-side,
+		color-mix(in oklab, var(--mm-primary) 16%, transparent),
+		transparent
+	);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.home-rise,
+	.home-depth,
+	.home-flash,
+	.home-dot,
+	.home-float,
+	.home-marquee {
+		animation: none;
+	}
+}

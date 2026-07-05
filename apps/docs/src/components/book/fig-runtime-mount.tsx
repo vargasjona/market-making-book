@@ -10,6 +10,6 @@ import { initChapter } from "./fig-runtime";
  * removes window listeners on navigation.
  */
 export function FigRuntime({ chapter }: { chapter: string }) {
-  useEffect(() => initChapter(chapter), [chapter]);
-  return null;
+	useEffect(() => initChapter(chapter), [chapter]);
+	return null;
 }

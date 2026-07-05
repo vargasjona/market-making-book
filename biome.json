@@ -8,7 +8,6 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**",
       "!**/.next",
       "!**/dist",
       "!**/.turbo",
@@ -80,5 +79,23 @@
       "tailwindDirectives": true
     }
   },
+  "overrides": [
+    {
+      "includes": ["apps/docs/src/app/book.css"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/docs/src/components/book/fig-runtime.js"],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ],
   "extends": ["ultracite/biome/core"]
 }
