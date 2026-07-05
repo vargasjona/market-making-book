@@ -1,3 +1,35 @@
+# AGENTS.md
+
+## Project Overview
+
+**The Market Making Book** — a book about market making published as a Fumadocs (Next.js 16) documentation site, in a Bun + Turborepo monorepo.
+
+### Layout
+
+- `apps/docs/` — the only app: the book site (Next.js + Fumadocs, dev server on port 4000)
+  - `content/docs/` — the 20 book chapters as MDX (`01-trading-from-zero.mdx` … `20-glossary.mdx`, ordered via `meta.json`)
+  - `src/app/api/chat/route.ts` — "Ask AI" chat endpoint (OpenRouter + flexsearch over chapters); model comes from `OPENROUTER_MODEL`, key from `OPENROUTER_API_KEY` in `apps/docs/.env.local`
+  - `src/components/ai/` — chat UI; the assistant's display name uses `appName`
+  - `src/lib/shared.ts` — `appName` (site + chat bot name) and route constants
+  - `src/lib/source.ts` — Fumadocs content loader
+  - `src/app/book.css`, `theme.css` — custom book styling; `src/components/theme-customizer.tsx` for theme switching
+- `packages/config/` — shared workspace config
+
+### Commands (run from repo root)
+
+- `bun run dev` — dev servers via turbo (docs at http://localhost:4000)
+- `bun run build` — build all apps
+- `bun run check-types` — typecheck (runs `fumadocs-mdx`, `next typegen`, `tsc`); app scripts must be named `check-types` to match the turbo task
+- `bun run check` / `bun run fix` — Ultracite lint / auto-fix
+
+### Gotchas
+
+- If typecheck fails on stale routes (e.g. a deleted route still referenced in `.next/dev/types`), remove `apps/docs/.next` and `tsconfig.tsbuildinfo`, then rerun.
+- `next-themes` is a direct dependency of `apps/docs` (there is no workspace catalog).
+- Content edits only need MDX changes in `content/docs/`; navigation order lives in `content/docs/meta.json`.
+
+---
+
 # Ultracite Code Standards
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
