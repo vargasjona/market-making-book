@@ -3807,6 +3807,563 @@ export function initChapter(key) {
 		filter();
 	};
 
+	/* ================= CH 2b — MARKET DATA ================= */
+	figInit.chData = () => {
+		/* shared synthetic 90-second price path so both figures agree */
+		var N = 90;
+		var mid = [];
+		var p = 97431,
+			s = 987654321;
+		var rnd = function () {
+			s = (s * 1103515245 + 12345) & 0x7fffffff;
+			return s / 0x7fffffff - 0.5;
+		};
+		for (var i = 0; i < N; i++) {
+			p += rnd() * 26 + Math.sin(i / 7) * 7;
+			mid.push(p);
+		}
+		var spread = mid.map(function (_, i) {
+			return 3 + Math.abs(Math.sin(i / 4)) * 7;
+		});
+
+		/* ---- FIG 1: derivation diagram (animated: packets flow to each box) ---- */
+		var d = cv("cv-md-derive");
+		if (d) {
+			var dLanes = [
+				{ t: "ORDER BOOK", s: "every level, both sides", c: C.blue },
+				{ t: "QUOTE TICKS", s: "best bid / best ask", c: C.green },
+				{ t: "TRADE TICKS", s: "each fill: price, size, side", c: C.amber },
+				{ t: "KLINES", s: "OHLCV per minute", c: C.red },
+			];
+			var dPhase = 0;
+			var drawDerive = function () {
+				var x = d.ctx,
+					W = d.W(),
+					H = d.H();
+				x.clearRect(0, 0, W, H);
+				var boxW = Math.min(190, W * 0.4);
+				var gapY = H / dLanes.length;
+				var spineX = 30;
+				var srcY = gapY / 2;
+				for (var i = 0; i < dLanes.length; i++) {
+					var cy = gapY * i + gapY / 2;
+					var bx = W - boxW - 6;
+					/* arrow + flowing packet from source spine to each box */
+					if (i > 0) {
+						x.strokeStyle = C.grid;
+						x.lineWidth = 1.4;
+						x.beginPath();
+						x.moveTo(spineX, srcY + 26);
+						x.lineTo(spineX, cy);
+						x.lineTo(bx - 6, cy);
+						x.stroke();
+						x.fillStyle = C.grid;
+						x.beginPath();
+						x.moveTo(bx - 6, cy);
+						x.lineTo(bx - 13, cy - 4);
+						x.lineTo(bx - 13, cy + 4);
+						x.fill();
+						/* animated packet travelling the horizontal leg, staggered per lane */
+						var segLen = bx - 6 - spineX;
+						var tt = (dPhase + i * 0.22) % 1;
+						var px = spineX + tt * segLen;
+						var alpha = Math.sin(tt * Math.PI); /* fade in/out at ends */
+						x.globalAlpha = 0.15 + 0.85 * alpha;
+						x.fillStyle = dLanes[i].c;
+						x.beginPath();
+						x.arc(px, cy, 3.4, 0, Math.PI * 2);
+						x.fill();
+						x.globalAlpha = 1;
+					}
+					/* box */
+					x.fillStyle = "rgba(255,255,255,0.02)";
+					x.strokeStyle = dLanes[i].c;
+					x.lineWidth = 1.5;
+					x.beginPath();
+					if (x.roundRect) {
+						x.roundRect(bx, cy - 26, boxW, 52, 8);
+					} else {
+						x.rect(bx, cy - 26, boxW, 52);
+					}
+					x.fill();
+					x.stroke();
+					x.fillStyle = dLanes[i].c;
+					x.font = "600 13px 'IBM Plex Mono', monospace";
+					x.fillText(dLanes[i].t, bx + 12, cy - 4);
+					x.fillStyle = C.dim;
+					x.font = "11px 'IBM Plex Mono', monospace";
+					x.fillText(dLanes[i].s, bx + 12, cy + 14);
+				}
+				/* source node on the spine */
+				x.fillStyle = C.blue;
+				x.beginPath();
+				x.arc(spineX, srcY, 6, 0, Math.PI * 2);
+				x.fill();
+				x.font = "600 11px 'IBM Plex Mono', monospace";
+				x.fillText("source", spineX - 6, srcY - 14);
+			};
+			var dLoop = function () {
+				if (alive) {
+					dPhase = (dPhase + 0.006) % 1;
+					drawDerive();
+				}
+				if (!reduceMotion && alive) {
+					requestAnimationFrame(dLoop);
+				}
+			};
+			drawDerive();
+			d.onResize(drawDerive);
+			if (!reduceMotion) {
+				dLoop();
+			}
+		}
+
+		/* ---- FIG 2: same 90s, four views ---- */
+		var v = cv("cv-md-views");
+		var mode = "quote";
+		var elView = document.getElementById("md-view");
+		var elKeep = document.getElementById("md-keep");
+		var elSpread = document.getElementById("md-spread");
+		var elGood = document.getElementById("md-good");
+		var META = {
+			book: {
+				name: "order book depth",
+				keep: "every level & size",
+				spread: "yes — plus depth",
+				good: "market making, queue signals, HFT",
+			},
+			quote: {
+				name: "quote ticks",
+				keep: "every bid/ask change",
+				spread: "yes",
+				good: "market making, spread capture, trailing stops",
+			},
+			trade: {
+				name: "trade ticks",
+				keep: "each fill, with side",
+				spread: "no — only executions",
+				good: "order-flow signals, fill realism",
+			},
+			kline: {
+				name: "klines / bars",
+				keep: "OHLCV per minute",
+				spread: "no — averaged away",
+				good: "directional strategies, charting",
+			},
+		};
+		if (v) {
+			var PADX = 10,
+				PADY = 16;
+			var reveal = 1; /* 0..1 streaming sweep; 1 = fully drawn */
+			var range = function () {
+				var lo = Math.min.apply(null, mid) - 14,
+					hi = Math.max.apply(null, mid) + 14;
+				return [lo, hi];
+			};
+			var sy = function (val, lo, hi, H) {
+				return PADY + (1 - (val - lo) / (hi - lo)) * (H - 2 * PADY);
+			};
+			var drawViews = function () {
+				var x = v.ctx,
+					W = v.W(),
+					H = v.H();
+				x.clearRect(0, 0, W, H);
+				/* grid */
+				x.strokeStyle = C.grid;
+				x.lineWidth = 1;
+				for (var g = 1; g < 4; g++) {
+					var gy = (H / 4) * g;
+					x.beginPath();
+					x.moveTo(0, gy);
+					x.lineTo(W, gy);
+					x.stroke();
+				}
+				var r = range(),
+					lo = r[0],
+					hi = r[1];
+				var step = (W - 2 * PADX) / (N - 1);
+				var xAt = function (i) {
+					return PADX + i * step;
+				};
+				/* streaming clip: reveal data left-to-right (book view is a static
+				   snapshot, so it skips the sweep) */
+				var revealX = PADX + reveal * (W - 2 * PADX);
+				if (reveal < 1 && mode !== "book") {
+					x.save();
+					x.beginPath();
+					x.rect(0, 0, revealX, H);
+					x.clip();
+				}
+
+				if (mode === "kline") {
+					var per = 18; /* 18s candles -> 5 candles */
+					var cw = step * per * 0.55;
+					for (var b = 0; b < N; b += per) {
+						var seg = mid.slice(b, Math.min(N, b + per));
+						if (!seg.length) continue;
+						var o = seg[0],
+							c = seg[seg.length - 1];
+						var hh = Math.max.apply(null, seg) + 3,
+							ll = Math.min.apply(null, seg) - 3;
+						var cx = xAt(b + per / 2);
+						var up = c >= o;
+						var col = up ? C.green : C.red;
+						x.strokeStyle = col;
+						x.fillStyle = col;
+						x.lineWidth = 1.5;
+						x.beginPath();
+						x.moveTo(cx, sy(hh, lo, hi, H));
+						x.lineTo(cx, sy(ll, lo, hi, H));
+						x.stroke();
+						var yo = sy(o, lo, hi, H),
+							yc = sy(c, lo, hi, H);
+						x.fillRect(
+							cx - cw / 2,
+							Math.min(yo, yc),
+							cw,
+							Math.max(2, Math.abs(yc - yo))
+						);
+					}
+				} else if (mode === "quote") {
+					var bid = mid.map(function (m, i) {
+						return m - spread[i] / 2;
+					});
+					var ask = mid.map(function (m, i) {
+						return m + spread[i] / 2;
+					});
+					/* spread band */
+					x.beginPath();
+					for (var i2 = 0; i2 < N; i2++)
+						x.lineTo(xAt(i2), sy(ask[i2], lo, hi, H));
+					for (var j2 = N - 1; j2 >= 0; j2--)
+						x.lineTo(xAt(j2), sy(bid[j2], lo, hi, H));
+					x.closePath();
+					x.fillStyle = "rgba(111,168,255,0.14)";
+					x.fill();
+					var lineArr = function (arr, col) {
+						x.strokeStyle = col;
+						x.lineWidth = 2;
+						x.beginPath();
+						for (var k = 0; k < N; k++) {
+							var xx = xAt(k),
+								yy = sy(arr[k], lo, hi, H);
+							k ? x.lineTo(xx, yy) : x.moveTo(xx, yy);
+						}
+						x.stroke();
+					};
+					lineArr(ask, C.red);
+					lineArr(bid, C.green);
+				} else if (mode === "trade") {
+					var seed2 = 424242;
+					var rnd2 = function () {
+						seed2 = (seed2 * 1103515245 + 12345) & 0x7fffffff;
+						return seed2 / 0x7fffffff;
+					};
+					var M = 150;
+					for (var t = 0; t < M; t++) {
+						var frac = t / (M - 1);
+						var idx = frac * (N - 1);
+						var i0 = Math.floor(idx),
+							i1 = Math.min(N - 1, i0 + 1),
+							f = idx - i0;
+						var base = mid[i0] * (1 - f) + mid[i1] * f;
+						var jit = (rnd2() - 0.5) * 14;
+						var xx2 = PADX + frac * (W - 2 * PADX);
+						var yy2 = sy(base + jit, lo, hi, H);
+						var buy = rnd2() > 0.5;
+						var rr = 1.5 + rnd2() * 3.5;
+						x.beginPath();
+						x.arc(xx2, yy2, rr, 0, Math.PI * 2);
+						x.fillStyle = buy ? C.green : C.red;
+						x.globalAlpha = 0.72;
+						x.fill();
+						x.globalAlpha = 1;
+					}
+				} else if (mode === "book") {
+					/* depth ladders around the last mid */
+					var last = mid[N - 1];
+					var levels = 7;
+					var colW = (W - 2 * PADX) / 2 - 8;
+					var rowH = (H - 2 * PADY) / levels;
+					var seed3 = 55;
+					var rnd3 = function () {
+						seed3 = (seed3 * 1103515245 + 12345) & 0x7fffffff;
+						return seed3 / 0x7fffffff;
+					};
+					for (var L = 0; L < levels; L++) {
+						var yb = PADY + L * rowH;
+						var bidW = colW * (0.35 + rnd3() * 0.6);
+						var askW = colW * (0.35 + rnd3() * 0.6);
+						/* bids grow left from center */
+						x.fillStyle = "rgba(127,227,176,0.5)";
+						x.fillRect(PADX + colW - bidW, yb + 2, bidW, rowH - 4);
+						x.fillStyle = "rgba(240,138,126,0.5)";
+						x.fillRect(PADX + colW + 16, yb + 2, askW, rowH - 4);
+					}
+					x.strokeStyle = C.dim;
+					x.setLineDash([4, 4]);
+					x.beginPath();
+					x.moveTo(PADX + colW + 8, PADY);
+					x.lineTo(PADX + colW + 8, H - PADY);
+					x.stroke();
+					x.setLineDash([]);
+					x.fillStyle = C.dim;
+					x.font = "10px 'IBM Plex Mono', monospace";
+					x.fillText("bids", PADX + 4, PADY - 4);
+					x.fillText("asks", PADX + colW + 20, PADY - 4);
+				}
+				/* close the streaming clip and draw a glowing leading edge */
+				if (reveal < 1 && mode !== "book") {
+					x.restore();
+					x.strokeStyle = META[mode] && mode === "quote" ? C.green : C.amber;
+					x.globalAlpha = 0.5 + 0.5 * Math.abs(Math.sin(reveal * 12));
+					x.lineWidth = 2;
+					x.beginPath();
+					x.moveTo(revealX, PADY);
+					x.lineTo(revealX, H - PADY);
+					x.stroke();
+					x.globalAlpha = 1;
+				}
+			};
+			var streamRAF = null;
+			var stream = function () {
+				if (!alive) return;
+				reveal = Math.min(1, reveal + 0.02);
+				drawViews();
+				if (reveal < 1 && !reduceMotion) {
+					streamRAF = requestAnimationFrame(stream);
+				}
+			};
+			var sync = function (animate) {
+				var m = META[mode];
+				if (elView) elView.textContent = m.name;
+				if (elKeep) elKeep.textContent = m.keep;
+				if (elSpread) {
+					elSpread.textContent = m.spread;
+					elSpread.className =
+						"v " + (m.spread.indexOf("yes") === 0 ? "pos" : "neg");
+				}
+				if (elGood) elGood.textContent = m.good;
+				if (animate && !reduceMotion && mode !== "book") {
+					reveal = 0;
+					if (streamRAF) cancelAnimationFrame(streamRAF);
+					stream();
+				} else {
+					reveal = 1;
+					drawViews();
+				}
+			};
+			var bind = function (id, mo) {
+				var b = document.getElementById(id);
+				if (b)
+					b.addEventListener("click", function () {
+						mode = mo;
+						sync(true);
+					});
+			};
+			bind("md-book", "book");
+			bind("md-quote", "quote");
+			bind("md-trade", "trade");
+			bind("md-kline", "kline");
+			v.onResize(function () {
+				reveal = 1;
+				drawViews();
+			});
+			sync(true);
+		}
+	};
+
+	/* ================= CH 3b — STRATEGY FAMILIES ================= */
+	figInit.chStrat = () => {
+		var sv = cv("cv-strat");
+		if (!sv) {
+			return;
+		}
+		var Npts = 120;
+		/* build a trending and a choppy path from the same noise */
+		function buildPath(regime, seed) {
+			var s = seed,
+				rnd = function () {
+					s = (s * 1103515245 + 12345) & 0x7fffffff;
+					return s / 0x7fffffff - 0.5;
+				};
+			var arr = [],
+				p = 100;
+			for (var i = 0; i < Npts; i++) {
+				if (regime === "trend") {
+					p += 0.28 + rnd() * 1.4;
+				} else {
+					/* mean-revert toward 100 */
+					p += (100 - p) * 0.06 + rnd() * 2.4;
+				}
+				arr.push(p);
+			}
+			return arr;
+		}
+		var paths = {
+			trend: buildPath("trend", 246813),
+			chop: buildPath("chop", 135791),
+		};
+		var strat = "trend",
+			regime = "trend";
+		var elName = document.getElementById("st-name");
+		var elReg = document.getElementById("st-reg");
+		var elPnl = document.getElementById("st-pnl");
+
+		var VERDICT = {
+			trend: {
+				trend: ["prints — rides the whole move", true],
+				chop: ["bleeds — whipsawed by every fake breakout", false],
+			},
+			mr: {
+				trend: ["blows up — fades a real trend all the way down", false],
+				chop: ["prints — fades every extreme back to the mean", true],
+			},
+			mm: {
+				trend: [
+					"taxed — one side fills, inventory piles up against the move",
+					false,
+				],
+				chop: [
+					"prints — both quotes fill, spread captured, inventory self-corrects",
+					true,
+				],
+			},
+		};
+
+		var PADX = 12,
+			PADY = 18;
+		var anim = 0;
+		var drawStrat = function () {
+			var x = sv.ctx,
+				W = sv.W(),
+				H = sv.H();
+			x.clearRect(0, 0, W, H);
+			var series = paths[regime];
+			var lo = Math.min.apply(null, series) - 4,
+				hi = Math.max.apply(null, series) + 4;
+			var step = (W - 2 * PADX) / (Npts - 1);
+			var xAt = function (i) {
+				return PADX + i * step;
+			};
+			var yAt = function (val) {
+				return PADY + (1 - (val - lo) / (hi - lo)) * (H - 2 * PADY);
+			};
+			/* grid */
+			x.strokeStyle = C.grid;
+			x.lineWidth = 1;
+			for (var g = 1; g < 4; g++) {
+				var gy = (H / 4) * g;
+				x.beginPath();
+				x.moveTo(0, gy);
+				x.lineTo(W, gy);
+				x.stroke();
+			}
+			/* fair-value line for MM / MR context */
+			if (strat === "mm" || strat === "mr") {
+				x.strokeStyle = C.dim;
+				x.setLineDash([4, 4]);
+				x.lineWidth = 1;
+				/* rolling mean */
+				var win = 12;
+				x.beginPath();
+				for (var m = 0; m < Npts; m++) {
+					var a = Math.max(0, m - win),
+						sum = 0,
+						cnt = 0;
+					for (var q = a; q <= m; q++) {
+						sum += series[q];
+						cnt++;
+					}
+					var mv = sum / cnt;
+					m ? x.lineTo(xAt(m), yAt(mv)) : x.moveTo(xAt(m), yAt(mv));
+				}
+				x.stroke();
+				x.setLineDash([]);
+			}
+			/* price line */
+			x.strokeStyle = C.text;
+			x.lineWidth = 2;
+			x.beginPath();
+			for (var i = 0; i < Npts; i++) {
+				i ? x.lineTo(xAt(i), yAt(series[i])) : x.moveTo(xAt(i), yAt(series[i]));
+			}
+			x.stroke();
+			/* strategy markers: sample every few points, color by whether this
+			   strategy would have won locally */
+			var lastGood = VERDICT[strat][regime][1];
+			var upTo = Math.floor(anim * Npts);
+			for (var k = 6; k < Npts - 1; k += 6) {
+				if (k > upTo) break;
+				var localUp = series[k] > series[k - 6];
+				var win2;
+				if (strat === "trend") win2 = localUp === series[k + 1] > series[k];
+				else if (strat === "mr") win2 = localUp !== series[k + 1] > series[k];
+				else {
+					/* MM: wins when price stays near mean (small move), loses on big moves */
+					win2 = Math.abs(series[k] - series[k - 6]) < 2.2;
+				}
+				/* bias the coloring toward the headline verdict so it reads clearly */
+				if (!lastGood && Math.abs(series[k] - series[k - 6]) > 1)
+					win2 = k % 12 === 0;
+				x.fillStyle = win2 ? C.green : C.red;
+				x.globalAlpha = 0.85;
+				x.beginPath();
+				x.arc(xAt(k), yAt(series[k]), 4, 0, Math.PI * 2);
+				x.fill();
+				x.globalAlpha = 1;
+			}
+		};
+		var loop = function () {
+			if (alive && anim < 1) {
+				anim = Math.min(1, anim + 0.03);
+				drawStrat();
+			}
+			if (!reduceMotion && alive && anim < 1) {
+				requestAnimationFrame(loop);
+			}
+		};
+		var sync = function () {
+			var nm = { trend: "trend-follow", mr: "mean-revert", mm: "market-make" };
+			if (elName) elName.textContent = nm[strat];
+			if (elReg) elReg.textContent = regime === "trend" ? "trending" : "choppy";
+			if (elPnl) {
+				var vd = VERDICT[strat][regime];
+				elPnl.textContent = vd[0];
+				elPnl.className = "v " + (vd[1] ? "pos" : "neg");
+			}
+			anim = reduceMotion ? 1 : 0;
+			if (reduceMotion) drawStrat();
+			else loop();
+		};
+		var bindS = function (id, fn) {
+			var b = document.getElementById(id);
+			if (b) b.addEventListener("click", fn);
+		};
+		bindS("st-trend", function () {
+			strat = "trend";
+			sync();
+		});
+		bindS("st-mr", function () {
+			strat = "mr";
+			sync();
+		});
+		bindS("st-mm", function () {
+			strat = "mm";
+			sync();
+		});
+		bindS("st-reg-trend", function () {
+			regime = "trend";
+			sync();
+		});
+		bindS("st-reg-chop", function () {
+			regime = "chop";
+			sync();
+		});
+		sv.onResize(drawStrat);
+		sync();
+	};
+
 	if (figInit[key]) {
 		figInit[key]();
 	}

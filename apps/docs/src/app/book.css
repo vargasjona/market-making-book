@@ -613,6 +613,48 @@
 	color: var(--accent);
 	white-space: nowrap;
 }
+
+/* Raw data record samples (ch 2b) — a monospace panel echoing the .eq look. */
+.mm-book .raw-data {
+	padding: 14px 18px;
+	margin: 18px 0;
+	overflow-x: auto;
+	white-space: pre;
+	font-family: "IBM Plex Mono", monospace;
+	font-size: 13.5px;
+	line-height: 1.7;
+	color: var(--ink);
+	background: #fffefa;
+	border: 1px solid #e6dfcf;
+	border-radius: var(--radius);
+}
+.mm-book .raw-data .rd-label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 10.5px;
+	color: var(--ink-faint);
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+}
+.mm-book .raw-data .rd-bid {
+	color: var(--bid);
+	font-weight: 600;
+}
+.mm-book .raw-data .rd-ask {
+	color: var(--ask);
+	font-weight: 600;
+}
+
+/* Horizontally scrollable wrapper for the wide comparison table (ch 2b). */
+.mm-book .cmp-scroll {
+	overflow-x: auto;
+	margin: 20px 0;
+}
+.mm-book .cmp-scroll table {
+	margin: 0;
+	min-width: 640px;
+}
+
 @media (max-width: 980px) {
 	.mm-book h2.ch-title {
 		font-size: 32px;

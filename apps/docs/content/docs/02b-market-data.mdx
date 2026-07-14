@@ -1,0 +1,90 @@
+---
+title: "2b. Market Data: What You Feed the Machine"
+description: "Klines, quote ticks, trade ticks, orders, and the order book are five different recordings of the same market. Before you can backtest a strategy, you must know which recording it needs — and why a market maker cannot survive on candles."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part I · Chapter 2b</div>
+
+<p>Chapters 1 and 2 described the market as a <em>place</em> — a book of bids and asks, painted into candles. This chapter describes it as <strong>data</strong>: the actual records a venue hands you and a backtester consumes. The distinction is not academic. Pick the wrong recording and your strategy either can't be tested or lies to you — the single most common way a first backtest fails is feeding it data that doesn't contain what the strategy needs to read.</p>
+
+<p>There are five recordings of the same underlying reality. They differ in one axis above all: <strong>how much of the truth they keep, versus throw away.</strong></p>
+
+### The order book — the ground truth
+
+<p>Everything else is derived from this. The <strong>limit order book</strong> (Chapter 1) is the live, complete list of every resting order: every price level, the size waiting there, on both sides. As data, a <strong>book snapshot</strong> (or "L2 / depth" feed) is a record like:</p>
+
+<div className="raw-data"><span className="rd-label">book snapshot @ t</span>
+bids: [ (97431, 2.4), (97430, 5.1), (97429, 0.8), … ]
+asks: [ (97433, 1.2), (97434, 3.0), (97435, 6.6), … ]</div>
+
+<p>It is the richest and heaviest recording — the only one that shows <strong>depth</strong> (how much size rests away from the touch) and lets you reason about <strong>queue position</strong> (Chapter 7). A full-fidelity feed streams every add, cancel, and fill (the "L3 / MBO" — market-by-order — view). This is the truth from which klines, quotes, and trades are all just summaries.</p>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">diagram — one market, five recordings</span></div> <div className="fig-body"><canvas id="cv-md-derive" height="300"></canvas></div> <div className="fig-cap">The order book (left) is the source. A <strong>trade tick</strong> is emitted each time an order crosses and fills. A <strong>quote tick</strong> is emitted whenever the best bid or ask changes. A <strong>kline</strong> is a bucket that swallows a whole minute of trades and keeps only four prices and a volume. Reading left to right is reading detail being discarded — each arrow is information you can never recover downstream.</div> </div>
+
+### Quote ticks — the top of the book, live
+
+<p>A <strong>quote tick</strong> (best-bid-offer, "BBO") is a snapshot of just the <em>top</em> of the book: the best bid, the best ask, and the size available at each, stamped the instant either one changes.</p>
+
+<div className="raw-data"><span className="rd-label">quote tick</span>
+ts=…, <span className="rd-bid">bid=97431.0 (2.4)</span>, <span className="rd-ask">ask=97433.0 (1.2)</span></div>
+
+<p>It throws away depth beyond the touch but keeps the two numbers that <em>define</em> a tradeable market: what you can buy at and sell at, <strong>right now</strong>. Quotes update many times per second. The gap between bid and ask is the <strong>spread</strong> — and that gap is the market maker's entire revenue model. A quote tick is the smallest record that still contains a spread.</p>
+
+<div className="keyidea"><span className="tag">Why the market maker lives here</span>A market maker's job is to <em>post</em> a bid and an ask and earn the difference. To do that it must know, continuously, where the current best bid and ask are — so it can quote inside them, and so it knows whether its own resting quote would fill. That information exists <strong>only</strong> in quote ticks (or the full book). No amount of candle data contains it. This is why every market-making strategy is quote-driven or book-driven, and none run on klines alone.</div>
+
+### Trade ticks — what actually executed
+
+<p>A <strong>trade tick</strong> is a single completed transaction: price, quantity, timestamp, and which side was the aggressor (did a taker lift the ask, or hit the bid?).</p>
+
+<div className="raw-data"><span className="rd-label">trade tick</span>
+ts=…, price=97433.0, qty=0.15, side=<span className="rd-ask">BUY (taker lifted ask)</span></div>
+
+<p>Trades are the finest-grained record of <em>what happened</em> — the raw stream that klines are literally built from by bucketing into intervals. They tell you the exact price and size of every fill and the direction of aggression (the basis of order-flow signals, Chapter 7). But note what a trade tick does <strong>not</strong> contain: the bid and ask that stood on either side of it. A trade tells you where a deal closed, not the live quotes around it. Trades ≠ quotes.</p>
+
+### Klines (bars/candles) — a minute, compressed to five numbers
+
+<p>A <strong>kline</strong> — candlestick, bar — takes every trade in a fixed window and keeps only five numbers: <strong>open, high, low, close, volume</strong> (Chapter 2). Everything else about the minute is discarded.</p>
+
+<div className="raw-data"><span className="rd-label">1-minute kline (Binance CSV row)</span>
+open_time, <span className="rd-bid">open=87648.21</span>, high=87648.22, low=87632.74, <span className="rd-ask">close=87648.00</span>, vol=4.08</div>
+
+<p>This is the most <strong>compressed</strong> recording — and by far the most common, because it is small, free, and universally available. It answers "where did price go this minute?" perfectly. It cannot answer "what is the spread?", "how deep is the book?", or "was that fill a buy or a sell?" — those questions were averaged away the moment the bucket closed. A kline has <strong>no bid and no ask</strong>. That single absence is why the strategy you can build on it is <em>directional</em>, never spread-based.</p>
+
+### Orders — your side of the conversation
+
+<p>The four above are what the market <em>tells you</em>. An <strong>order</strong> is what you <em>tell the market</em> — the fifth record, flowing the other way. A limit order ("rest 0.5 BTC to buy at 97430"), a market order ("buy 0.5 now"), or any of the richer types from Chapter 2 (post-only, IOC, stop). Your orders enter the same book as everyone else's; when one fills, the venue sends you back a <strong>fill</strong> (an execution report) — which, from the outside, looks exactly like a trade tick. The loop closes: you read quotes and book, you emit orders, the book emits trades, and the cycle repeats.</p>
+
+### Which recording does your strategy need?
+
+<p>The practical question. Match the strategy's <em>question</em> to the recording that can answer it:</p>
+
+<div className="cmp-scroll">
+<table><tbody>
+<tr><th>Recording</th><th>Keeps</th><th>Good for</th><th>Cannot do</th></tr>
+<tr><td><strong>Order book</strong> (L2/L3)</td><td>every level &amp; size, both sides</td><td className="good">market making, depth/queue signals, HFT, realistic fills</td><td>heavy; often paid; hard to store</td></tr>
+<tr><td><strong>Quote ticks</strong> (BBO)</td><td>best bid, best ask, sizes</td><td className="good">market making, spread capture, trailing stops, realistic backtests</td><td>no depth beyond the touch</td></tr>
+<tr><td><strong>Trade ticks</strong></td><td>every fill: price, size, side</td><td>order-flow signals, tick strategies, better fill realism</td><td>no live bid/ask; not a spread</td></tr>
+<tr><td><strong>Klines / bars</strong></td><td>OHLCV per interval</td><td className="good">directional strategies (EMA, trend, mean-reversion), charting, most retail backtests</td><td>no spread, no depth, no side — useless for MM</td></tr>
+<tr><td><strong>Orders / fills</strong></td><td>your intents &amp; executions</td><td>your P&amp;L, position, and execution audit</td><td>describes you, not the market</td></tr>
+</tbody></table>
+</div>
+
+<div className="warn"><span className="tag">The trap that breaks first backtests</span>A strategy silently assumes a recording. Feed it the wrong one and it doesn't error loudly — it under-trades or misfires. A textbook example: a <em>trailing-stop</em> strategy recomputes its stop from the live quote every tick; hand it only klines and it finds no quotes, rejects nearly every order, and "does nothing" — while a <em>bracket</em> strategy on the same klines works fine, because it fixes its stop from the bar's close. Same signal, opposite outcome, decided entirely by which recording each one reads.</div>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — the same 90 seconds, four ways</span></div> <div className="fig-body"> <canvas id="cv-md-views" height="270"></canvas> <div className="ctrl-row"> <button className="btn" id="md-book">Order book depth</button> <button className="btn" id="md-quote">Quote ticks (bid/ask)</button> <button className="btn" id="md-trade">Trade ticks</button> <button className="btn" id="md-kline">Klines</button> </div> <div className="readout"> <div className="r"><span className="k">Viewing</span><span className="v" id="md-view">quote ticks</span></div> <div className="r"><span className="k">Records kept</span><span className="v" id="md-keep">every bid/ask change</span></div> <div className="r"><span className="k">Can see the spread?</span><span className="v" id="md-spread">—</span></div> <div className="r"><span className="k">Good for</span><span className="v" id="md-good" style={{fontSize:'13px',maxWidth:'320px'}}>—</span></div> </div> </div> <div className="fig-cap">One synthetic 90-second slice, redrawn as each recording would store it. The quote view shows the two lines a maker needs; the trade view shows individual fills colored by aggressor; the kline view collapses it all into a handful of candles. Toggle through them and watch information vanish — by the kline view, the spread the market maker trades has become invisible.</div> </div>
+
+### Where crypto data comes from — and what's free
+
+<p>Because this book's practical chapters use Binance (Chapter 12), one distinction is worth burning in now:</p>
+
+<ul>
+<li><strong>Klines and trades are free and historical.</strong> Binance's public archive (Binance Vision) publishes years of both. This is what you download to backtest a directional strategy.</li>
+<li><strong>Quotes and order-book history are <em>not</em> free from Binance.</strong> The archive contains no historical bid/ask. To backtest a market maker on real quotes you either pay a tick-data vendor, or <strong>synthesize</strong> quotes from bars/trades (a modeled spread — only as honest as the model).</li>
+<li><strong>Live quotes and the live book <em>are</em> free</strong> — over Binance's real-time WebSocket. So a market maker can paper-trade on free live quotes even though it cannot cheaply backtest on historical ones.</li>
+</ul>
+
+<div className="keyidea"><span className="tag">What you now know</span>Five recordings of one market, ordered by fidelity: order book ⊃ quote ticks ⊃ trade ticks ⊃ klines, plus your own orders flowing back. Directional strategies live happily on cheap klines; market making cannot — it needs the spread, which exists only in quotes and the book. The first rule of any backtest is to feed the strategy the recording it silently assumes. Part II now goes underground into the territory quotes and the book describe: why the spread exists, and what it must pay for.</div>
+
+<FigRuntime chapter="chData" />
+</div>

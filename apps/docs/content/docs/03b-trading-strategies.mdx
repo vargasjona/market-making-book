@@ -1,0 +1,96 @@
+---
+title: "3b. The Families of Trading Strategies"
+description: "Every trading strategy is a bet about one of three things: that a move continues, that it reverses, or that two prices should agree. Market making is a fourth, stranger bet — on flow itself. A field guide to where each family earns its edge, and which market it kills in."
+---
+
+<div className="mm-book">
+<div className="eyebrow">Part I · Chapter 3b</div>
+
+<p>Before diving deeper into market making, it helps to see the whole map — where market making sits among the other ways people try to make money in markets. Almost every strategy ever traded belongs to one of a handful of <strong>families</strong>, and each family is really a single sentence: a bet about what price will do next. Knowing the families tells you three things at a glance — what a strategy assumes, what market it thrives in, and (crucially, after Chapter 2b) what <em>data</em> it needs.</p>
+
+<div className="keyidea"><span className="tag">The one axis that organizes everything</span>Directional strategies bet on <em>where price goes</em> — they only need to know the price, so <strong>klines are enough</strong>. Market making bets on <em>the flow around the price</em> — it needs the spread, so it requires <strong>quotes or the book</strong>. That single distinction, drawn in Chapter 2b, splits the entire field in two.</div>
+
+### 1. Trend-following / momentum
+
+<p><strong>The bet:</strong> "a move in motion tends to continue." Buy what's going up, sell what's going down, and ride it until it turns.</p>
+
+<p>This is the oldest and most intuitive family. The classic implementation is a <strong>moving-average crossover</strong> (Chapter 2): when a fast EMA rises above a slow one, go long; when it falls below, go short. Breakout systems are momentum too — buy when price clears a prior high. Trend-following is <strong>convex</strong>: many small losing whipsaws paid for by a few enormous winners when a real trend arrives. It is the strategy behind the managed-futures industry (CTAs).</p>
+
+<ul>
+<li><strong>Thrives in:</strong> strong, persistent trends — a bull run, a currency devaluation, a commodity shock.</li>
+<li><strong>Dies in:</strong> choppy, range-bound markets — it buys every false breakout and sells every false breakdown, bleeding on costs.</li>
+<li><strong>Data it needs:</strong> klines. Direction is all it reads. <em>(This is the family the <code>EMACrossBracketAlgo</code> in the companion backtester belongs to.)</em></li>
+</ul>
+
+### 2. Mean-reversion
+
+<p><strong>The bet:</strong> "a move stretched too far tends to snap back." Sell what's risen too fast, buy what's fallen too far, and profit from the return to normal.</p>
+
+<p>The mirror image of momentum. Implementations fade extremes: buy when price pierces the lower <strong>Bollinger band</strong>, sell at the upper; short a stock that's spiked on no news. The bet is that prices oscillate around a fair value and that deviations are temporary. Statistically it's a bet on <strong>negative autocorrelation</strong> of returns.</p>
+
+<ul>
+<li><strong>Thrives in:</strong> calm, range-bound, liquid markets that oscillate around a stable level.</li>
+<li><strong>Dies in:</strong> trends and regime breaks — "the market can stay irrational longer than you can stay solvent." Fading a real trend is how mean-reverters blow up.</li>
+<li><strong>Data it needs:</strong> klines suffice; tick data sharpens entries.</li>
+</ul>
+
+<div className="keyidea"><span className="tag">Why this matters for market making</span>A market maker is, structurally, a <strong>mean-reversion trader in disguise</strong>. It posts a bid below and an ask above the fair price and profits when price oscillates between them (both quotes fill, inventory self-corrects). That's why <em>chop is the maker's paradise and trend is the maker's tax</em> — the exact same regime dependence as a mean-reverter, which is no coincidence. Part II makes this precise.</div>
+
+### 3. Arbitrage &amp; relative value
+
+<p><strong>The bet:</strong> "two prices that should be equal, aren't — yet." Buy the cheap one, sell the rich one, and collect the difference when they converge.</p>
+
+<p>The purest family — in its ideal form, <em>riskless</em>. Variants span a spectrum of how "sure" the convergence is:</p>
+
+<ul>
+<li><strong>Pure arbitrage</strong> — the same asset at two prices (BTC cheaper on one exchange than another). Nearly riskless, fiercely competed, won on <strong>latency</strong>.</li>
+<li><strong>Triangular arbitrage</strong> — a loop of currency pairs whose rates don't multiply to 1.</li>
+<li><strong>Statistical arbitrage / pairs trading</strong> — two <em>correlated</em> assets (e.g. Coke vs Pepsi) whose spread has widened; bet it reconverges. Not riskless — the relationship can break.</li>
+<li><strong>Basis / funding trades</strong> — spot vs future, or perp funding on Hyperliquid/Binance (Chapters 11–12).</li>
+</ul>
+
+<ul>
+<li><strong>Thrives in:</strong> fragmented markets and temporary dislocations. Its edge is speed and infrastructure, not prediction.</li>
+<li><strong>Dies in:</strong> a slow stack (someone faster takes the trade first) or when a "should converge" relationship structurally breaks.</li>
+<li><strong>Data it needs:</strong> often <strong>quotes / the book on multiple venues at once</strong> — you're comparing live prices, not history.</li>
+</ul>
+
+### 4. Market making — the flow bet
+
+<p><strong>The bet:</strong> "I don't know where price is going, and I don't need to." Quote a bid and an ask, earn the spread as both fill, and manage the inventory that piles up when they don't.</p>
+
+<p>This is the family this entire book is about, and it is <em>categorically different</em> from the three above. The others are <strong>directional or convergence</strong> bets — they profit from price <em>moving</em> (or two prices <em>converging</em>). Market making profits from <strong>providing liquidity</strong>: it's paid the spread as a fee for immediacy, regardless of direction, and its enemy isn't being wrong about direction but <strong>adverse selection</strong> (getting filled by someone who knows more) and <strong>inventory risk</strong> (the price running away while you're stuck holding). Those two forces are the whole of Part II.</p>
+
+<ul>
+<li><strong>Thrives in:</strong> liquid, mean-reverting, two-sided flow — many small uninformed traders paying the spread in both directions.</li>
+<li><strong>Dies in:</strong> trending or toxic markets — one side fills relentlessly, inventory piles up against the move, and informed flow picks off stale quotes. (The failure mode of naive quoting and grid bots, Chapter 15.)</li>
+<li><strong>Data it needs:</strong> <strong>quotes and the order book</strong> — it lives inside the spread and cannot see it on klines. This is exactly why the trailing-stop backtest failed on kline data in Chapter 2b.</li>
+</ul>
+
+<div className="fig"> <div className="fig-bar"><span className="dot d1"></span><span className="dot d2"></span><span className="dot d3"></span><span className="fig-t">interactive — the same price, four strategies, two regimes</span></div> <div className="fig-body"> <canvas id="cv-strat" height="270"></canvas> <div className="ctrl-row"> <button className="btn" id="st-trend">Trend-follow</button> <button className="btn" id="st-mr">Mean-revert</button> <button className="btn" id="st-mm">Market-make</button> <div className="ctrl" style={{marginLeft:'auto'}}><label>Regime</label> <div style={{display:'flex',gap:'6px'}}> <button className="btn" id="st-reg-trend" style={{padding:'6px 10px'}}>Trending</button> <button className="btn" id="st-reg-chop" style={{padding:'6px 10px'}}>Choppy</button> </div></div> </div> <div className="readout"> <div className="r"><span className="k">Strategy</span><span className="v" id="st-name">trend-follow</span></div> <div className="r"><span className="k">Regime</span><span className="v" id="st-reg">trending</span></div> <div className="r"><span className="k">Verdict</span><span className="v" id="st-pnl" style={{fontSize:'13px',maxWidth:'320px'}}>—</span></div> </div> </div> <div className="fig-cap">One price path per regime; the shaded markers show where each strategy makes (<span style={{color:'var(--bid)'}}>green</span>) or loses (<span style={{color:'var(--ask)'}}>red</span>) money. Flip the regime and watch the verdict invert: trend-following prints in a trend and bleeds in chop; mean-reversion and market-making do the opposite. No strategy is "good" — each is a bet on a regime, and the job is matching the bet to the market (Chapter 14).</div> </div>
+
+### The honorable mentions
+
+<ul>
+<li><strong>Scalping</strong> — very-short-horizon momentum/mean-reversion on tiny moves; blurs into market making at the fast end.</li>
+<li><strong>Carry</strong> — holding a position that pays you to wait (funding, dividends, roll yield). You're paid for bearing a risk, not for predicting.</li>
+<li><strong>Event / news trading</strong> — betting on the reaction to a scheduled event (earnings, a Fed decision, a sports outcome — Chapters 8–9). For a market maker, events are when you <em>widen or pull</em> quotes, not when you predict.</li>
+<li><strong>Grid trading</strong> — a lattice of buy/sell orders around a level; mechanically a market-maker-lite, and it shares the maker's fatal weakness to trends (Chapter 15).</li>
+</ul>
+
+### How they fit together
+
+<table><tbody>
+<tr><th>Family</th><th>Bets that…</th><th>Loves</th><th>Hates</th><th>Needs</th></tr>
+<tr><td><strong>Trend / momentum</strong></td><td>moves continue</td><td>strong trends</td><td>chop</td><td>klines</td></tr>
+<tr><td><strong>Mean-reversion</strong></td><td>moves snap back</td><td>ranges</td><td>trends</td><td>klines / ticks</td></tr>
+<tr><td><strong>Arbitrage / rel-value</strong></td><td>prices converge</td><td>dislocations</td><td>a slow stack</td><td>multi-venue quotes</td></tr>
+<tr><td className="good"><strong>Market making</strong></td><td>flow pays the spread</td><td>liquid chop</td><td>toxic trends</td><td>quotes / book</td></tr>
+</tbody></table>
+
+<div className="warn"><span className="tag">The one honest truth about all of them</span>None of these families is inherently profitable. Each is a conditional bet — profitable <em>in its regime</em>, ruinous outside it. The trend-follower and the mean-reverter take opposite sides of the same tape and both can be right, in different weeks. The skill isn't picking "the best strategy"; it's <strong>diagnosing the regime</strong> and matching the bet to it — and, for a market maker, knowing when the regime has turned toxic enough to stop quoting entirely. That diagnosis is the subject of Chapter 14, and the reason Part II builds the math before Part IV builds the algorithms.</div>
+
+<div className="keyidea"><span className="tag">What you now know</span>Four families, one axis: directional bets (trend, mean-reversion) need only price and run on klines; convergence bets (arbitrage) need live multi-venue quotes; and market making — the flow bet — needs the spread, which lives only in quotes and the book. Market making is a mean-reverter's cousin that gets <em>paid a fee</em> instead of taking a view, and dies in exactly the trends a momentum trader loves. With the map in hand, Part II now goes deep into why the maker's spread exists and what it must pay for.</div>
+
+<FigRuntime chapter="chStrat" />
+</div>
